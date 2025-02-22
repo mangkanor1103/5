@@ -180,23 +180,44 @@ if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
 }
 ?>
 
-
 <script>
-      function checkFacePosition() {
-          fetch('http://127.0.0.1:5000/face_position')
-              .then(response => response.json())
-              .then(data => {
-                  console.log("Face Position:", data.position);
-                  if (data.position === "LEFT" || data.position === "RIGHT") {
-                      window.location.href = "warning.html";
-                  }
-              })
-              .catch(error => console.error("Error fetching face position:", error));
-      }
+    let faceDetectionInterval; // Store the interval globally
 
-      // Check face position every 1 second
-      setInterval(checkFacePosition, 1000);
-  </script>
+    function checkFacePosition() {
+        fetch('http://127.0.0.1:5000/face_position')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Face Position:", data.position);
+                if (data.position === "LEFT" || data.position === "RIGHT") {
+                    sessionStorage.setItem("faceDetected", "true"); // Store flag before redirecting
+                    clearInterval(faceDetectionInterval); // Stop checking when redirecting
+                    window.location.href = "warning.html";
+                }
+            })
+            .catch(error => console.error("Error fetching face position:", error));
+    }
+
+    function startFaceDetection() {
+        if (!faceDetectionInterval) {
+            faceDetectionInterval = setInterval(checkFacePosition, 1000);
+        }
+    }
+
+    function restartFaceDetection() {
+        if (sessionStorage.getItem("faceDetected") === "true") {
+            sessionStorage.removeItem("faceDetected"); // Remove flag to avoid looping
+            setTimeout(() => {
+                startFaceDetection(); // Restart face detection after returning
+            }, 500);
+        } else {
+            startFaceDetection(); // Normal start if not returning from warning page
+        }
+    }
+
+    // Restart face detection when the page loads
+    window.onload = restartFaceDetection;
+</script>
+
 
 <?php
 // Result display

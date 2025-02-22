@@ -14,6 +14,15 @@
 <body>
     <h1>⚠ Warning ⚠</h1>
     <p>Your face moved out of the allowed area! Please keep your face centered.</p>
-    <a href="account.php">Go Back</a>
+    <p>Please Wait</p>
+
+    <script>
+      window.onload = function() {
+          setTimeout(() => {
+              window.history.back(); // Automatically go back after 3 seconds
+          }, 3000);
+      };
+  </script>
+  
 </body>
 </html>
