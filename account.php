@@ -144,44 +144,48 @@ if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
     $total = @$_GET['t'];
     $q = mysqli_query($con, "SELECT * FROM questions WHERE eid='$eid' AND sn='$sn' ");
 
-    echo '<div class="panel" style="margin:5%; display: flex; justify-content: space-between;">';
+    echo '<div class="quiz-container" style="display: flex; gap: 20px; padding: 20px; height: 80vh;">';
 
-    // Left side - Questions and options
-    echo '<div style="width: 60%;">';
+    // Left side - Questions
+    echo '<div class="quiz-section" style="flex: 1; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); overflow-y: auto;">';
+    echo '<h2 style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">Question ' . $sn . '</h2>';
+
     while ($row = mysqli_fetch_array($q)) {
         $qns = $row['qns'];
         $qid = $row['qid'];
-        echo '<b>Question &nbsp;' . $sn . '&nbsp;:<br><br>' . $qns . ' <br>';
+        echo '<p style="font-size: 18px; margin-bottom: 15px;">' . $qns . '</p>';
     }
 
     $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ");
 
-    echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST" class="form-horizontal">
-    <br />';
+    echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST">';
 
     while ($row = mysqli_fetch_array($q)) {
         $option = $row['option'];
         $optionid = $row['optionid'];
-        echo '<input type="radio" name="ans" value="' . $optionid . '"><b> ' . $option . ' </b><br><br>';
+        echo '<label style="display: block; margin-bottom: 10px;">
+                <input type="radio" name="ans" value="' . $optionid . '" style="margin-right: 10px;">' . $option . '
+              </label>';
     }
 
-    echo '<br /><button type="submit" class="btn btn-primary" style="border-radius:0%">
-    <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>&nbsp;Submit</button></form></div>';
+    echo '<br /><button type="submit" class="btn btn-primary" style="background: #007bff; border: none; padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer;">
+            Submit
+          </button>
+          </form>';
+    echo '</div>'; // End of quiz section
 
-    // Right side - Live Camera Feed
-    echo '        <!-- Right side: Camera Feed -->
-        <div class="camera-container">
-            <h1>Face Movement Detection</h1>
-            <img src="http://127.0.0.1:5000/video_feed" width="640" height="480">
-        </div>
-    </div>';
+    // Right side - Camera Feed
+    echo '<div class="camera-section" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8f9fa; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1);">
+            <h2 style="color: #333;">Face Detection</h2>
+            <img src="http://127.0.0.1:5000/video_feed" style="width: 100%; max-width: 600px; border-radius: 10px;">
+          </div>';
 
-    echo '</div>'; // End of panel
+    echo '</div>'; // End of quiz container
 }
 ?>
 
 <script>
-    let faceDetectionInterval; // Store the interval globally
+    let faceDetectionInterval;
 
     function checkFacePosition() {
         fetch('http://127.0.0.1:5000/face_position')
@@ -189,8 +193,8 @@ if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
             .then(data => {
                 console.log("Face Position:", data.position);
                 if (data.position === "LEFT" || data.position === "RIGHT") {
-                    sessionStorage.setItem("faceDetected", "true"); // Store flag before redirecting
-                    clearInterval(faceDetectionInterval); // Stop checking when redirecting
+                    sessionStorage.setItem("faceDetected", "true");
+                    clearInterval(faceDetectionInterval);
                     window.location.href = "warning.html";
                 }
             })
@@ -199,24 +203,24 @@ if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
 
     function startFaceDetection() {
         if (!faceDetectionInterval) {
-            faceDetectionInterval = setInterval(checkFacePosition, 1000);
+            faceDetectionInterval = setInterval(checkFacePosition, 100);
         }
     }
 
     function restartFaceDetection() {
         if (sessionStorage.getItem("faceDetected") === "true") {
-            sessionStorage.removeItem("faceDetected"); // Remove flag to avoid looping
+            sessionStorage.removeItem("faceDetected");
             setTimeout(() => {
-                startFaceDetection(); // Restart face detection after returning
-            }, 500);
+                startFaceDetection();
+            }, 100);
         } else {
-            startFaceDetection(); // Normal start if not returning from warning page
+            startFaceDetection();
         }
     }
 
-    // Restart face detection when the page loads
     window.onload = restartFaceDetection;
 </script>
+
 
 
 <?php
