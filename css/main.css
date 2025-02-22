@@ -8,12 +8,14 @@ body {
 }
 .bg {
   min-height: 540px;
-  background-image: url('../image/rsbg.jpg');  min-height: 550px;
+  background-image: url('../image/rsbg.jpg');
+  min-height: 550px;
 
 }
 .bg1 {
   min-height: 535px;
-  background-image: url('../image/rsbg.jpg');  min-height: 550px;
+  background-image: url('../image/rsbg.jpg');
+   min-height: 550px;
 
 }
 
@@ -32,7 +34,8 @@ body {
   margin: 40px;
   padding: 20px;
   font: 15px "Century Gothic", "Times Roman", sans-serif;
-  background-image: url('../image/rsbg.jpg');  min-height: 550px;
+  background-image: url('../image/rsbg.jpg');
+    min-height: 550px;
   transition: transform 0.3s ease-in-out;
 }
 
@@ -45,8 +48,8 @@ body {
 }
 
 .header {
-  background: #6b705c; /* Dark Green */
-  height: 70px;
+  background-image: url('../image/rsbg.jpg');
+    height: 70px;
   display: flex;
   align-items: center;
   padding: 0 20px;
