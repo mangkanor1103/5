@@ -203,7 +203,7 @@ if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
 
     function startFaceDetection() {
         if (!faceDetectionInterval) {
-            faceDetectionInterval = setInterval(checkFacePosition, 100);
+            faceDetectionInterval = setInterval(checkFacePosition, 1000);
         }
     }
 
@@ -212,7 +212,7 @@ if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
             sessionStorage.removeItem("faceDetected");
             setTimeout(() => {
                 startFaceDetection();
-            }, 100);
+            }, 1000);
         } else {
             startFaceDetection();
         }
