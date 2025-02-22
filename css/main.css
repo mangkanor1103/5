@@ -2,17 +2,19 @@ body {
   overflow-x: hidden;
   width: 100%;
   font: 15px "Century Gothic", "Times Roman", sans-serif;
-  background: #f5f5dc; /* Beige Background */
-  min-height: 550px;
+  background-image: url('../image/rsbg.jpg');  min-height: 550px;
   background-attachment: fixed;
   transition: background 0.5s ease-in-out;
 }
 .bg {
   min-height: 540px;
+  background-image: url('../image/rsbg.jpg');  min-height: 550px;
+
 }
 .bg1 {
-  background: #f5f5dc; /* Beige Background */
   min-height: 535px;
+  background-image: url('../image/rsbg.jpg');  min-height: 550px;
+
 }
 
 @font-face {
@@ -30,7 +32,7 @@ body {
   margin: 40px;
   padding: 20px;
   font: 15px "Century Gothic", "Times Roman", sans-serif;
-  background: rgba(255, 255, 255, 0.8); /* Light Background */
+  background-image: url('../image/rsbg.jpg');  min-height: 550px;
   transition: transform 0.3s ease-in-out;
 }
 
@@ -74,7 +76,7 @@ body {
 
 .sub1 {
   color: #f5f5dc; /* Beige */
-  background: #4a5a38; /* Dark Green */
+  background-image: url('../image/rsbg.jpg');  min-height: 550px;
   font-size: 15px;
   height: 35px;
   margin: 20px;
