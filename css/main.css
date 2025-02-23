@@ -8,13 +8,13 @@ body {
 }
 .bg {
   min-height: 540px;
-  background-image: url('../image/rsbg.jpg');
+  background-image: url('../image/bg.jpg');
   min-height: 550px;
 
 }
 .bg1 {
   min-height: 535px;
-  background-image: url('../image/rsbg.jpg');
+  background-image: url('../image/bg.jpg');
    min-height: 550px;
 
 }
@@ -34,7 +34,7 @@ body {
   margin: 40px;
   padding: 20px;
   font: 15px "Century Gothic", "Times Roman", sans-serif;
-  background-image: url('../image/rsbg.jpg');
+  background-color: #f7f7f7;
     min-height: 550px;
   transition: transform 0.3s ease-in-out;
 }
