@@ -48,7 +48,7 @@ body {
 }
 
 .header {
-  background-image: url('../image/rsbg.jpg');
+  background-color: #f7f7f7;
     height: 70px;
   display: flex;
   align-items: center;
@@ -79,7 +79,7 @@ body {
 
 .sub1 {
   color: #f5f5dc; /* Beige */
-  background-image: url('../image/rsbg.jpg');  min-height: 550px;
+  background-color: #f7f7f7;
   font-size: 15px;
   height: 35px;
   margin: 20px;
