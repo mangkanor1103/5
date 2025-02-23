@@ -31,7 +31,7 @@ $(function () {
 });</script>
 </head>
 
-<body  style="background:#eee;">
+<body  style="background-color:orange;">
 <div class="header">
 <div class="row">
 <div class="col-lg-6">

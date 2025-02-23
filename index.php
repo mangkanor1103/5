@@ -25,6 +25,7 @@ var b = document.forms["form"]["cpassword"].value;if (a!=b){alert("Passwords mus
 
 </head>
 
+
 <body>
 <div class="header">
 <div class="row">
