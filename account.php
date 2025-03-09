@@ -63,7 +63,6 @@ if (!isset($_SESSION['email'])) {
             padding-top: 60px; /* Space for fixed header */
         }
         .panel {
-
             background-color: white;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -116,48 +115,43 @@ if (!isset($_SESSION['email'])) {
             color: #00c6ff; /* Change color on hover */
         }
         .quiz-container {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    width: 100%;
-    min-width: 1200px; /* Ensures it stays at least 1200px */
-    margin: 0 auto;
-    padding: 20px;
-    position: relative; /* Needed for absolute positioning inside */
-}
-
-.quiz-section {
-    flex: 1;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-    margin-right: 20px;
-}
-
-.camera-section {
-    width: 120px; /* Smaller box */
-    height: 120px; /* Square shape */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: #f8f9fa;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-
-    position: absolute; /* Position inside .quiz-container */
-    bottom: 20px; /* Distance from bottom */
-    right: 20px; /* Distance from right */
-}
-
-.camera-section img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-}
-
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            min-width: 1200px; /* Ensures it stays at least 1200px */
+            margin: 0 auto;
+            padding: 20px;
+            position: relative; /* Needed for absolute positioning inside */
+        }
+        .quiz-section {
+            flex: 1;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            margin-right: 20px;
+        }
+        .camera-section {
+            width: 120px; /* Smaller box */
+            height: 120px; /* Square shape */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+            position: absolute; /* Position inside .quiz-container */
+            bottom: 20px; /* Distance from bottom */
+            right: 20px; /* Distance from right */
+        }
+        .camera-section img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
     </style>
 </head>
 
@@ -168,11 +162,14 @@ if (!isset($_SESSION['email'])) {
     <div>
         <span class="pull-right top title1">
             <span class="log1"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;Hello,</span>
-            <a href="account.php?q=1" class="log log1"><?php echo htmlspecialchars($name); ?></a>&nbsp;|&nbsp;
-            <a href="logout.php?q=account.php" class="log"><span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Logout</a>
+            <a href="account.php?q=1" class="log log1" style="color: yellow;"><?php echo htmlspecialchars($name); ?></a>&nbsp;|&nbsp;
+            <a href="logout.php?q=account.php" class="log" style="color: yellow;">
+                <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>&nbsp;Logout
+            </a>
         </span>
     </div>
 </div>
+
 
 <nav class="navbar navbar-default title1">
     <div class="container-fluid">
@@ -187,15 +184,8 @@ if (!isset($_SESSION['email'])) {
         <div class="collapse navbar-collapse" id="navbar-collapse">
             <ul class="nav navbar-nav">
                 <li <?php if (@$_GET['q'] == 1) echo 'class="active"'; ?>><a href="account.php?q=1"><span class="glyphicon glyphicon-home" aria-hidden="true"></span>&nbsp;Home</a></li>
-                <li <?php if (@$_GET['q'] == 2) echo 'class="active"'; ?>><a href="account.php?q=2"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>&nbsp;History</a></li>
-                <li <?php if (@$_GET['q'] == 3) echo 'class="active"'; ?>><a href="account.php?q=3"><span class="glyphicon glyphicon-stats" aria-hidden="true"></span>&nbsp;Ranking</a></li>
+                <!-- Removed History and Ranking -->
             </ul>
-            <form class="navbar-form navbar-left" role="search">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Enter tag ">
-                </div>
-                <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search" aria-hidden="true"></span>&nbsp;Search</button>
-            </form>
         </div>
     </div>
 </nav>
@@ -203,8 +193,9 @@ if (!isset($_SESSION['email'])) {
 <div class="container">
     <div class="row">
         <div class="col-md-12">
-            <?php if (@$_GET['q'] == 1) {
-                echo "<h3 class='text-center'>Available Tests</h3>";
+            <?php if (@$_GET['q'] == 1) { ?>
+                <h3 class="text-center" style="margin-top: -220px;">Available Tests</h3> <!-- Moves title higher -->
+                <?php
                 $result = mysqli_query($con, "SELECT * FROM quiz ORDER BY date DESC") or die('Error');
                 echo '<div class="panel"><table class="table table-striped title1">
                 <tr><td><b>S.N.</b></td><td><b>Topic</b></td><td><b>Total Question</b></td><td><b>Marks</b></td><td><b>Time limit</b></td><td></td></tr>';
@@ -219,84 +210,85 @@ if (!isset($_SESSION['email'])) {
                     $rowcount = mysqli_num_rows($q12);
                     if ($rowcount == 0) {
                         echo '<tr><td>' . $c++ . '</td><td>' . $title . '</td><td>' . $total . '</td><td>' . $sahi * $total . '</td><td>' . $time . '&nbsp;min</td>
-                        <td><b><a href="account.php?q=quiz&step=2&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-danger" style="margin:0px;"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></td></tr>';
+                        <td><b><a href="account.php?q=quiz&step=2&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-danger" style="margin:0px;">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></td></tr>';
                     } else {
                         echo '<tr style="color:#2db44a"><td>' . $c++ . '</td><td>' . $title . '&nbsp;<span title="This exam has been already solved by you" class="glyphicon glyphicon-ok" aria-hidden="true"></span></td><td>' . $total . '</td><td>' . $sahi * $total . '</td><td>' . $time . '&nbsp;min</td>
-                        <td><b><a href="update.php?q=quizre&step=25&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-danger" style="margin:0px;"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></td></tr>';
+                        <td><b><a href="update.php?q=quizre&step=25&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-danger" style="margin:0px;">
+                        <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></td></tr>';
                     }
                 }
                 echo '</table></div>';
             } ?>
-<?php
-if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
-    $eid = @$_GET['eid'];
-    $sn = @$_GET['n'];
-    $total = @$_GET['t'];
-    $q = mysqli_query($con, "SELECT * FROM questions WHERE eid='$eid' AND sn='$sn' ");
-    echo '<div class="quiz-container" style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; height: 60vh; position: relative;margin-top: -200px;">';
-    echo '<div class="quiz-section" style="flex: 1; width: 100%; max-width: 800px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); auto; position: relative;">';
-    echo '<h2 style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">Question ' . $sn . '</h2>';
 
-    while ($row = mysqli_fetch_array($q)) {
-        $qns = $row['qns'];
-        $qid = $row['qid'];
-        echo '<p style="font-size: 18px; margin-bottom: 15px;">' . $qns . '</p>';
-    }
+            <?php
+            if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
+                $eid = @$_GET['eid'];
+                $sn = @$_GET['n'];
+                $total = @$_GET['t'];
+                $q = mysqli_query($con, "SELECT * FROM questions WHERE eid='$eid' AND sn='$sn' ");
+                echo '<div class="quiz-container" style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; height: 60vh; position: relative;margin-top: -200px;">';
+                echo '<div class="quiz-section" style="flex: 1; width: 100%; max-width: 800px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); auto; position: relative;">';
+                echo '<h2 style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">Question ' . $sn . '</h2>';
 
-    $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ");
-    echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST">';
-    $optionLabels = ['A', 'B', 'C', 'D']; // Labels for options
-    $index = 0; // Index for option labels
-    while ($row = mysqli_fetch_array($q)) {
-        $option = $row['option'];
-        $optionid = $row['optionid'];
-        echo '<label style="display: block; margin-bottom: 10px;">
-                <input type="radio" name="ans" value="' . $optionid . '" style="margin-right: 10px;">' . $optionLabels[$index++] . '. ' . $option . '
-              </label>';
-    }
+                while ($row = mysqli_fetch_array($q)) {
+                    $qns = $row['qns'];
+                    $qid = $row['qid'];
+                    echo '<p style="font-size: 18px; margin-bottom: 15px;">' . $qns . '</p>';
+                }
 
-    echo '<br /><button type="submit" class="btn btn-danger" style="padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor : pointer;">
-            Submit
-          </button>
-          </form>';
+                $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ");
+                echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST">';
+                $optionLabels = ['A', 'B', 'C', 'D']; // Labels for options
+                $index = 0; // Index for option labels
+                while ($row = mysqli_fetch_array($q)) {
+                    $option = $row['option'];
+                    $optionid = $row['optionid'];
+                    echo '<label style="display: block; margin-bottom: 10px;">
+                            <input type="radio" name="ans" value="' . $optionid . '" style="margin-right: 10px;">' . $optionLabels[$index++] . '. ' . $option . '
+                          </label>';
+                }
 
-    // Camera Section (inside the quiz section, slightly above bottom to align with options)
-    echo '<div class="camera-section" style="width: 150px; height: 150px; background: #f8f9fa; padding: 10px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); position: absolute; bottom: 80px; right: 20px; display: flex; align-items: center; justify-content: center;">
-            <img src="http://127.0.0.1:5000/video_feed" style="width: 100%; height: auto; border-radius: 10px;">
-          </div>';
+                echo '<br /><button type="submit" class="btn btn-danger" style="padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor : pointer;">
+                        Submit
+                      </button>
+                      </form>';
 
-    echo '</div>'; // End of quiz section
-    echo '</div>'; // End of quiz container
-}
-?>
+                // Camera Section (inside the quiz section, slightly above bottom to align with options)
+                echo '<div class="camera-section" style="width: 150px; height: 150px; background: #f8f9fa; padding: 10px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); position: absolute; bottom: 80px; right: 20px; display: flex; align-items: center; justify-content: center;">
+                        <img src="http://127.0.0.1:5000/video_feed" style="width: 100%; height: auto; border-radius: 10px;">
+                      </div>';
 
+                echo '</div>'; // End of quiz section
+                echo '</div>'; // End of quiz container
+            }
+            ?>
 
-<?php
-if (@$_GET['q'] == 'result' && @$_GET['eid']) {
-    $eid = @$_GET['eid'];
-    $q = mysqli_query($con, "SELECT * FROM history WHERE eid='$eid' AND email='$email' ") or die('Error157');
-    echo '<div class="panel" style="margin-top: -100px;"> <!-- Move it up -->
-    <center><h1 class="title" style="color:#660033">Result</h1><center><br />
-    <table class="table table-striped title1" style="font-size:20px;font-weight:1000;">';
-    while ($row = mysqli_fetch_array($q)) {
-        $s = $row['score'];
-        $w = $row['wrong'];
-        $r = $row['sahi'];
-        $qa = $row['level'];
-        echo '<tr style="color:#66 CCFF"><td>Total Questions</td><td>' . $qa . '</td></tr>
-              <tr style="color:#99cc32"><td>Right Answer&nbsp;<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></td><td>' . $r . '</td></tr>
-              <tr style="color:red"><td>Wrong Answer&nbsp;<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></td><td>' . $w . '</td></tr>
-              <tr style="color:#66CCFF"><td>Score&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></td><td>' . $s . '</td></tr>';
-    }
-    $q = mysqli_query($con, "SELECT * FROM rank WHERE email='$email' ") or die('Error157');
-    while ($row = mysqli_fetch_array($q)) {
-        $s = $row['score'];
-        echo '<tr style="color:#990000"><td>Overall Score&nbsp;<span class="glyphicon glyphicon-stats" aria-hidden="true"></span></td><td>' . $s . '</td></tr>';
-    }
-    echo '</table></div>';
-}
-?>
-
+            <?php
+            if (@$_GET['q'] == 'result' && @$_GET['eid']) {
+                $eid = @$_GET['eid'];
+                $q = mysqli_query($con, "SELECT * FROM history WHERE eid='$eid' AND email='$email' ") or die('Error157');
+                echo '<div class="panel" style="margin-top: -400px;"> <!-- Move it up -->
+                <center><h1 class="title" style="color:#660033">Result</h1><center><br />
+                <table class="table table-striped title1" style="font-size:20px;font-weight:1000;">';
+                while ($row = mysqli_fetch_array($q)) {
+                    $s = $row['score'];
+                    $w = $row['wrong'];
+                    $r = $row['sahi'];
+                    $qa = $row['level'];
+                    echo '<tr style="color:#66 CCFF"><td>Total Questions</td><td>' . $qa . '</td></tr>
+                          <tr style="color:#99cc32"><td>Right Answer&nbsp;<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></td><td>' . $r . '</td></tr>
+                          <tr style="color:red"><td>Wrong Answer&nbsp;<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></td><td>' . $w . '</td></tr>
+                          <tr style="color:#66CCFF"><td>Score&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></td><td>' . $s . '</td></tr>';
+                }
+                $q = mysqli_query($con, "SELECT * FROM rank WHERE email='$email' ") or die('Error157');
+                while ($row = mysqli_fetch_array($q)) {
+                    $s = $row['score'];
+                    echo '<tr style="color:#990000"><td>Overall Score&nbsp;<span class="glyphicon glyphicon-stats" aria-hidden="true"></span></td><td>' . $s . '</td></tr>';
+                }
+                echo '</table></div>';
+            }
+            ?>
         </div>
     </div>
 </div>
@@ -311,7 +303,6 @@ if (@$_GET['q'] == 'result' && @$_GET['eid']) {
         </div>
     </div>
 </div>
-
 
 <!-- Modal for Developers -->
 <div class="modal fade" id="developers">
@@ -337,6 +328,43 @@ if (@$_GET['q'] == 'result' && @$_GET['eid']) {
         </div>
     </div>
 </div>
+
+<script>
+    let faceDetectionInterval;
+
+    function checkFacePosition() {
+        fetch('http://127.0.0.1:5000/face_position')
+            .then(response => response.json())
+            .then(data => {
+                console.log("Face Position:", data.position);
+                if (data.position === "LEFT" || data.position === "RIGHT") {
+                    sessionStorage.setItem("faceDetected", "true");
+                    clearInterval(faceDetectionInterval);
+                    window.location.href = "warning.html";
+                }
+            })
+            .catch(error => console.error("Error fetching face position:", error));
+    }
+
+    function startFaceDetection() {
+        if (!faceDetectionInterval) {
+            faceDetectionInterval = setInterval(checkFacePosition, 1000);
+        }
+    }
+
+    function restartFaceDetection() {
+        if (sessionStorage.getItem("faceDetected") === "true") {
+            sessionStorage.removeItem("faceDetected");
+            setTimeout(() => {
+                startFaceDetection();
+            }, 500);
+        } else {
+            startFaceDetection();
+        }
+    }
+
+    window.onload = restartFaceDetection;
+</script>
 
 </body>
 </html>
