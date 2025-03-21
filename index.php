@@ -10,6 +10,7 @@
     <script src="js/jquery.js" type="text/javascript"></script>
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 
     <style>
         body {
@@ -20,6 +21,7 @@
             height: 100vh; /* Full height */
             display: flex;
             flex-direction: column;
+            position: relative; /* Position relative for absolute children */
         }
         .header {
             background-color: #28a745; /* Green background */
@@ -101,10 +103,40 @@
         .form-row {
             margin-bottom: 15px; /* Space between form rows */
         }
+
+        /* Moving Icons Background */
+        .moving-icons {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Prevent interaction with icons */
+            overflow: hidden; /* Hide overflow */
+            z-index: 0; /* Behind other content */
+        }
+        .moving-icons i {
+            position: absolute;
+            font-size: 50px; /* Size of icons */
+            color: rgba(40, 167, 69, 0.5); /* Light green color */
+            animation: move 10s linear infinite; /* Animation for moving icons */
+        }
+        @keyframes move {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-100vh); }
+        }
     </style>
 </head>
 
 <body>
+    <div class="moving-icons">
+        <i class="fas fa-graduation-cap" style="left: 10%; animation-delay: 0s;"></i>
+        <i class="fas fa-book" style="left: 30%; animation-delay: 2s;"></i>
+        <i class="fas fa-laptop" style="left: 50%; animation-delay: 4s;"></i>
+        <i class="fas fa-pencil-alt" style="left: 70%; animation-delay: 6s;"></i>
+        <i class="fas fa-users" style="left: 90%; animation-delay: 8s;"></i>
+    </div>
+
     <div class="header">
         <h1>RS Online Exam</h1>
         <a href="#" class="btn btn-light" data-toggle="modal" data-target="#myModal" style="color:white;">Login</a>
@@ -171,13 +203,19 @@
     <div class="footer">
         <div class="row">
             <div class="col-md-4">
-                <a href="#" data-toggle="modal" data-target="#login">Admin Login</a>
+                <a href="#" data-toggle="modal" data-target="#login" class="icon">
+                    <i class="fas fa-user-shield"></i> Admin Login
+                </a>
             </div>
             <div class="col-md-4">
-                <a href="#" data-toggle="modal" data-target="#developers">Developers</a>
+                <a href="#" data-toggle="modal" data-target="#developers" class="icon">
+                    <i class="fas fa-code"></i> Developers
+                </a>
             </div>
             <div class="col-md-4">
-                <a href="feedback.php" target="_blank">Feedback</a>
+                <a href="feedback.php" target="_blank" class="icon">
+                    <i class="fas fa-comments"></i> Feedback
+                </a>
             </div>
         </div>
     </div>
