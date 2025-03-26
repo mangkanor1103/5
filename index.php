@@ -11,6 +11,10 @@
     <script src="js/bootstrap.min.js" type="text/javascript"></script>
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
     <style>
         body {
@@ -92,6 +96,29 @@
             width: 100%;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
         }
+        .btn-custom {
+    background-color: white !important;
+    color: black !important;
+    border: 1px solid black;
+}
+.btn:hover {
+    background-color: #218838 !important; /* Darker green */
+    transform: scale(1.05); /* Slightly increase size */
+    transition: all 0.3s ease-in-out;
+}
+.btn-register {
+    background-color: red !important; /* Green */
+    border: none;
+    color: white !important;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-register:hover {
+    background-color: #218838 !important; /* Darker Green */
+    transform: scale(1.05);
+}
+
+
         .footer a {
             color: white;
             text-decoration: none;
@@ -139,7 +166,9 @@
 
     <div class="header">
         <h1>RS Online Exam</h1>
-        <a href="#" class="btn btn-light" data-toggle="modal" data-target="#myModal" style="color:white;">Login</a>
+        <a href="#" class="btn btn-custom" data-toggle="modal" data-target="#myModal">
+    <i class="fa fa-sign-in-alt"></i> Login
+</a>
     </div>
 
     <div class="container">
@@ -150,11 +179,13 @@
 
                     <div class="row">
                         <div class="col-md-6 form-row">
-                            <label class="control-label" for="name">Full Name</label>
+                        <label class="control-label" for="name">Full Name</label>
+                        <span class="input-group-text"><i class="fa fa-user"></i></span>
                             <input id="name" name="name" placeholder="Fullname" class="form-control" type="text" required>
                         </div>
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="gender">Gender</label>
+                            <span class="input-group-text"><i class="fa fa-venus-mars"></i></span>
                             <select id="gender" name="gender" class="form-control" required>
                                 <option value="">Select Gender</option>
                                 <option value="M">Male</option>
@@ -166,10 +197,12 @@
                     <div class="row">
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="college">College Name</label>
+                            <span class="input-group-text"><i class="fa fa-school"></i></span>
                             <input id="college" name="college" placeholder="College Name" class="form-control" type="text" required>
                         </div>
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="email">Email ID</label>
+                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                             <input id="email" name="email" placeholder="Email ID" class="form-control" type="email" required>
                         </div>
                     </div>
@@ -177,10 +210,12 @@
                     <div class="row">
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="mob">Contact Number</label>
+                            <span class="input-group-text"><i class="fa fa-phone"></i></span>
                             <input id="mob" name="mob" placeholder="Contact Number" class="form-control" type="number" required>
                         </div>
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="password">Password</label>
+                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
                             <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
                         </div>
                     </div>
@@ -188,12 +223,13 @@
                     <div class="row">
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="cpassword">Confirm Password</label>
+                            <span class="input-group-text"><i class="fa fa-check-circle"></i></span>
                             <input id="cpassword" name="cpassword" placeholder="Confirmation Password" class="form-control" type="password" required>
                         </div>
                     </div>
 
                     <div class="form-group text-center">
-                        <input type="submit" class="btn btn-danger" value="Register"/>
+                        <input type="submit" class="btn btn-register" value="Register"/>
                     </div>
                 </fieldset>
             </form>
