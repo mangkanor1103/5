@@ -226,7 +226,7 @@ if (!isset($_SESSION['email'])) {
                 $eid = @$_GET['eid'];
                 $sn = @$_GET['n'];
                 $total = @$_GET['t'];
-                $q = mysqli_query($con, "SELECT * FROM questions WHERE eid='$eid' AND sn='$sn' ");
+                $q = mysqli_query($con, "SELECT * FROM questions WHERE eid='$eid' ORDER BY RAND()");
                 echo '<div class="quiz-container" style="display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 20px; height: 60vh; position: relative;margin-top: -200px;">';
                 echo '<div class="quiz-section" style="flex: 1; width: 100%; max-width: 800px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); auto; position: relative;">';
                 echo '<h2 style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">Question ' . $sn . '</h2>';
@@ -237,7 +237,7 @@ if (!isset($_SESSION['email'])) {
                     echo '<p style="font-size: 18px; margin-bottom: 15px;">' . $qns . '</p>';
                 }
 
-                $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ");
+                $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ORDER BY RAND()");
                 echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST">';
                 $optionLabels = ['A', 'B', 'C', 'D']; // Labels for options
                 $index = 0; // Index for option labels

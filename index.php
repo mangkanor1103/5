@@ -304,7 +304,7 @@
                             </div>
                             <div class="col-md-8">
                                 <a style="color: #28a745; font-size: 18px; text-decoration: none;">Kian A. Rodrigez</a>
-                                <h4 style="color: #28a745;">+917785068889</h4>
+                                <h4 style="color: #28a745;">+9366717240</h4>
                                 <h4 style="color: #28a745;">kianr664@gmail.com</h4>
                             </div>
                         </div>
@@ -325,9 +325,13 @@
                 <div class="modal-body">
                     <form role="form" method="post" action="admin.php?q=index.php">
                         <div class="form-group">
+                        <label class="control-label" for="email">Username</label>
+                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                             <input type="text" name="uname" maxlength="20" placeholder="Admin Email" class="form-control" required/>
                         </div>
                         <div class="form-group">
+                        <label class="control-label" for="email">Password</label>
+                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
                             <input type="password" name="password" maxlength="15" placeholder="Password" class="form-control" required/>
                         </div>
                         <div class="form-group text-center">
