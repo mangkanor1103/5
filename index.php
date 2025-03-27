@@ -166,7 +166,7 @@
 
     <div class="header">
         <h1>RS Online Exam</h1>
-        <a href="#" class="btn btn-custom" data-toggle="modal" data-target="#myModal">
+        <a href="#" class="btn btn-register" data-toggle="modal" data-target="#myModal">
     <i class="fa fa-sign-in-alt"></i> Login
 </a>
     </div>
@@ -268,19 +268,21 @@
                     <form class="form-horizontal" action="login.php?q=index.php" method="POST">
                         <div class="form-group">
                             <label class="control-label" for="email">Email</label>
+                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                             <div>
                                 <input id="email" name="email" placeholder="Email" class="form-control" type="email" required>
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="password">Password</label>
+                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
                             <div>
                                 <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-danger">Log in</button>
+                            <button type="button" class="btn btn-register" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-register">Log in</button>
                         </div>
                     </form>
                 </div>

@@ -152,6 +152,17 @@ if (!isset($_SESSION['email'])) {
             height: auto;
             border-radius: 10px;
         }
+        .btn-register {
+    background-color: red !important; /* Green */
+    border: none;
+    color: white !important;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-register:hover {
+    background-color: #218838 !important; /* Darker Green */
+    transform: scale(1.05);
+}
     </style>
 </head>
 
@@ -210,11 +221,11 @@ if (!isset($_SESSION['email'])) {
                     $rowcount = mysqli_num_rows($q12);
                     if ($rowcount == 0) {
                         echo '<tr><td>' . $c++ . '</td><td>' . $title . '</td><td>' . $total . '</td><td>' . $sahi * $total . '</td><td>' . $time . '&nbsp;min</td>
-                        <td><b><a href="account.php?q=quiz&step=2&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-danger" style="margin:0px;">
+                        <td><b><a href="account.php?q=quiz&step=2&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-register" style="margin:0px;">
                         <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Start</b></span></a></b></td></tr>';
                     } else {
                         echo '<tr style="color:#2db44a"><td>' . $c++ . '</td><td>' . $title . '&nbsp;<span title="This exam has been already solved by you" class="glyphicon glyphicon-ok" aria-hidden="true"></span></td><td>' . $total . '</td><td>' . $sahi * $total . '</td><td>' . $time . '&nbsp;min</td>
-                        <td><b><a href="update.php?q=quizre&step=25&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-danger" style="margin:0px;">
+                        <td><b><a href="update.php?q=quizre&step=25&eid=' . $eid . '&n=1&t=' . $total . '" class="pull-right btn btn-register" style="margin:0px;">
                         <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span>&nbsp;<span class="title1"><b>Restart</b></span></a></b></td></tr>';
                     }
                 }
@@ -231,11 +242,11 @@ if (!isset($_SESSION['email'])) {
                 echo '<div class="quiz-section" style="flex: 1; width: 100%; max-width: 800px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); auto; position: relative;">';
                 echo '<h2 style="border-bottom: 2px solid #007bff; padding-bottom: 10px;">Question ' . $sn . '</h2>';
 
-                while ($row = mysqli_fetch_array($q)) {
+                $row = mysqli_fetch_array($q);
                     $qns = $row['qns'];
                     $qid = $row['qid'];
                     echo '<p style="font-size: 18px; margin-bottom: 15px;">' . $qns . '</p>';
-                }
+                
 
                 $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ORDER BY RAND()");
                 echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST">';
