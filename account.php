@@ -153,7 +153,7 @@ if (!isset($_SESSION['email'])) {
             border-radius: 10px;
         }
         .btn-register {
-    background-color: red !important; /* Green */
+    background-color: #b30000 !important; /* Green */
     border: none;
     color: white !important;
     transition: background-color 0.3s, transform 0.3s;
@@ -260,13 +260,13 @@ if (!isset($_SESSION['email'])) {
                           </label>';
                 }
 
-                echo '<br /><button type="submit" class="btn btn-danger" style="padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor : pointer;">
+                echo '<br /><button type="submit" class="btn btn-register" style="padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor : pointer;">
                         Submit
                       </button>
                       </form>';
 
                 // Camera Section (inside the quiz section, slightly above bottom to align with options)
-                echo '<div class="camera-section" style="width: 150px; height: 150px; background: #f8f9fa; padding: 10px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); position: absolute; bottom: 80px; right: 20px; display: flex; align-items: center; justify-content: center;">
+                echo '<div class="camera-section" style="width: 200px; height: 200px; background: #f8f9fa; padding: 10px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0,0,0,0.1); position: absolute; bottom: 50px; right: 20px; display: flex; align-items: center; justify-content: center;">
                         <img src="http://127.0.0.1:5000/video_feed" style="width: 100%; height: auto; border-radius: 10px;">
                       </div>';
 

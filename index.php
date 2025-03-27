@@ -107,7 +107,7 @@
     transition: all 0.3s ease-in-out;
 }
 .btn-register {
-    background-color: red !important; /* Green */
+    background-color: #b30000 !important; /* Green */
     border: none;
     color: white !important;
     transition: background-color 0.3s, transform 0.3s;
