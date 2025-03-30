@@ -344,8 +344,7 @@ if (!isset($_SESSION['email'])) {
     let faceDetectionInterval;
 
     function checkFacePosition() {
-        fetch('http://192.168.1.6:5000/face_position')
-            .then(response => response.json())
+      fetch('http://127.0.0.1:5000/face_position')            .then(response => response.json())
             .then(data => {
                 console.log("Face Position:", data.position);
                 if (data.position === "LEFT" || data.position === "RIGHT") {
