@@ -246,7 +246,7 @@ if (!isset($_SESSION['email'])) {
                     $qns = $row['qns'];
                     $qid = $row['qid'];
                     echo '<p style="font-size: 18px; margin-bottom: 15px;">' . $qns . '</p>';
-                
+
 
                 $q = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ORDER BY RAND()");
                 echo '<form action="update.php?q=quiz&step=2&eid=' . $eid . '&n=' . $sn . '&t=' . $total . '&qid=' . $qid . '" method="POST">';

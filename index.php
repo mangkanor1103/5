@@ -337,7 +337,7 @@
                             <input type="password" name="password" maxlength="15" placeholder="Password" class="form-control" required/>
                         </div>
                         <div class="form-group text-center">
-                            <input type="submit" name="login" value="Login" class="btn btn-danger" />
+                            <input type="submit" name="login" value="Login" class="btn btn-register" />
                         </div>
                     </form>
                 </div>
