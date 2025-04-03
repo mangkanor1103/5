@@ -53,7 +53,7 @@
             padding-top: 60px; /* Space for fixed header */
         }
         .panel {
-            background-color: white;
+            background-image: url(image/bg.jpg);
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
             padding: 30px;
@@ -196,9 +196,9 @@
 
                     <div class="row">
                         <div class="col-md-6 form-row">
-                            <label class="control-label" for="college">College Name</label>
+                            <label class="control-label" for="college">Year and Section</label>
                             <span class="input-group-text"><i class="fa fa-school"></i></span>
-                            <input id="college" name="college" placeholder="College Name" class="form-control" type="text" required>
+                            <input id="college" name="college" placeholder="Year and Section" class="form-control" type="text" required>
                         </div>
                         <div class="col-md-6 form-row">
                             <label class="control-label" for="email">Email ID</label>
@@ -347,3 +347,5 @@
 
 </body>
 </html>
+
+

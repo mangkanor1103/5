@@ -221,6 +221,19 @@ $q=mysqli_query($con,"UPDATE `rank` SET `score`=$sun ,time=NOW() WHERE email= '$
 header("location:account.php?q=quiz&step=2&eid=$eid&n=1&t=$t");
 }
 
+// Check if the delete action is requested
+if (isset($_GET['demail'])) {
+    $emailToDelete = $_GET['demail'];
+
+    // Prepare and execute the delete query
+    $deleteQuery = "DELETE FROM user WHERE email='$emailToDelete'";
+    if (mysqli_query($con, $deleteQuery)) {
+        echo "<script>alert('User deleted successfully!'); window.location.href='dash.php?q=1';</script>";
+    } else {
+        echo "<script>alert('Error deleting user.'); window.location.href='dash.php?q=1';</script>";
+    }
+}
+
 ?>
 
 
