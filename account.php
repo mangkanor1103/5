@@ -341,20 +341,34 @@ if (!isset($_SESSION['email'])) {
 </div>
 
 <script>
-    let faceDetectionInterval;
+function checkFacePosition() {
+    fetch('http://127.0.0.1:5000/face_position')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Face Position:", data.position);
+            console.log("Gaze Direction:", data.gaze);
 
-    function checkFacePosition() {
-      fetch('http://127.0.0.1:5000/face_position')            .then(response => response.json())
-            .then(data => {
-                console.log("Face Position:", data.position);
-                if (data.position === "LEFT" || data.position === "RIGHT") {
-                    sessionStorage.setItem("faceDetected", "true");
+            if (data.position === "LEFT" || data.position === "RIGHT" ||
+                data.gaze === "LEFT" || data.gaze === "RIGHT") {
+
+                let warnings = parseInt(sessionStorage.getItem("warnings")) || 0;
+                warnings++;
+                sessionStorage.setItem("warnings", warnings);
+
+                if (warnings >= 3) {
                     clearInterval(faceDetectionInterval);
-                    window.location.href = "warning.html";
+                    sessionStorage.clear(); // reset if needed
+                    window.location.href = "logout.php"; // your logout page
+                } else {
+                    clearInterval(faceDetectionInterval);
+                    window.location.href = "warning.html"; // show warning
                 }
-            })
-            .catch(error => console.error("Error fetching face position:", error));
-    }
+            }
+        })
+        .catch(error => console.error("Error fetching face position:", error));
+}
+const faceDetectionInterval = setInterval(checkFacePosition, 1000);
+
 
     function startFaceDetection() {
         if (!faceDetectionInterval) {
