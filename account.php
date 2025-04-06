@@ -279,7 +279,7 @@ if (!isset($_SESSION['email'])) {
             if (@$_GET['q'] == 'result' && @$_GET['eid']) {
                 $eid = @$_GET['eid'];
                 $q = mysqli_query($con, "SELECT * FROM history WHERE eid='$eid' AND email='$email' ") or die('Error157');
-                echo '<div class="panel" style="margin-top: -400px;"> <!-- Move it up -->
+                echo '<div class="panel" style="margin-top: -200px;"> <!-- Move it up -->
                 <center><h1 class="title" style="color:#660033">Result</h1><center><br />
                 <table class="table table-striped title1" style="font-size:20px;font-weight:1000;">';
                 while ($row = mysqli_fetch_array($q)) {
@@ -287,15 +287,14 @@ if (!isset($_SESSION['email'])) {
                     $w = $row['wrong'];
                     $r = $row['sahi'];
                     $qa = $row['level'];
-                    echo '<tr style="color:#66 CCFF"><td>Total Questions</td><td>' . $qa . '</td></tr>
-                          <tr style="color:#99cc32"><td>Right Answer&nbsp;<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span></td><td>' . $r . '</td></tr>
-                          <tr style="color:red"><td>Wrong Answer&nbsp;<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span></td><td>' . $w . '</td></tr>
-                          <tr style="color:#66CCFF"><td>Score&nbsp;<span class="glyphicon glyphicon-star" aria-hidden="true"></span></td><td>' . $s . '</td></tr>';
+                    echo '<tr style="color:#99cc32"><td>Right Answers</td><td>' . $r . '</td></tr>
+                    <tr style="color:#66CCFF"><td>Total Questions</td><td>' . $qa . '</td></tr>';
+
+
                 }
                 $q = mysqli_query($con, "SELECT * FROM rank WHERE email='$email' ") or die('Error157');
                 while ($row = mysqli_fetch_array($q)) {
                     $s = $row['score'];
-                    echo '<tr style="color:#990000"><td>Overall Score&nbsp;<span class="glyphicon glyphicon-stats" aria-hidden="true"></span></td><td>' . $s . '</td></tr>';
                 }
                 echo '</table></div>';
             }

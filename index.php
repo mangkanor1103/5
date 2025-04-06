@@ -165,11 +165,14 @@
     </div>
 
     <div class="header">
-        <h1>RS Online Exam</h1>
-        <a href="#" class="btn btn-register" data-toggle="modal" data-target="#myModal">
-    <i class="fa fa-sign-in-alt"></i> Login
-</a>
-    </div>
+    <img src="image/rslogo.jpg" alt="RS Logo" style="height: 50px; margin-right: 10px; border-radius: 50%;">
+    <h1 style="display: flex; align-items: center; margin: 0;">
+        RS Online Exam
+    </h1>
+    <a href="#" class="btn btn-register" data-toggle="modal" data-target="#myModal">
+        <i class="fa fa-sign-in-alt"></i> Login
+    </a>
+</div>
 
     <div class="container">
         <div class="panel">
