@@ -1,39 +1,77 @@
-# face_login.py
-from flask import Flask, request, jsonify
 import cv2
+import os
 import numpy as np
-import base64
-import mediapipe as mp
-import face_recognition
+from skimage.metrics import structural_similarity as ssim
 
-app = Flask(__name__)
+# Load Haar Cascade Classifier for face detection
+face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
 
-# Load known image (replace with actual user image)
-known_image = face_recognition.load_image_file("uploads/user1.jpg")
-known_encoding = face_recognition.face_encodings(known_image)[0]
+# Function to compute similarity between two images
+def compare_faces(image1, image2):
+    # Resize images to the same size for comparison
+    image1 = cv2.resize(image1, (200, 200))
+    image2 = cv2.resize(image2, (200, 200))
+    
+    # Convert to grayscale
+    image1_gray = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+    image2_gray = cv2.cvtColor(image2, cv2.COLOR_BGR2GRAY)
+    
+    # Compute the structural similarity index (SSIM) between the two images
+    score, _ = ssim(image1_gray, image2_gray, full=True)
+    return score
 
-@app.route('/', methods=['POST'])
-def face_login():
-    data = request.get_json()
-    image_data = data['image'].split(',')[1]
-    img_bytes = base64.b64decode(image_data)
+# Load known face images from the 'uploads' folder
+known_faces = []
+known_names = []
 
-    nparr = np.frombuffer(img_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+uploads_folder = 'uploads/'
 
-    try:
-        face_encodings = face_recognition.face_encodings(img)
-        if not face_encodings:
-            return jsonify({"status": "error", "message": "No face detected"})
+for filename in os.listdir(uploads_folder):
+    if filename.endswith(('.jpg', '.png')):
+        image_path = os.path.join(uploads_folder, filename)
+        image = cv2.imread(image_path)
+        known_faces.append(image)
+        known_names.append(filename)
 
-        match = face_recognition.compare_faces([known_encoding], face_encodings[0])
-        if match[0]:
-            return jsonify({"status": "success"})
-        else:
-            return jsonify({"status": "error", "message": "Face does not match"})
+# Capture video from webcam
+cap = cv2.VideoCapture(0)
 
-    except Exception as e:
-        return jsonify({"status": "error", "message": str(e)})
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    # Convert to grayscale for face detection
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    
+    # Detect faces in the frame
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    
+    for (x, y, w, h) in faces:
+        # Draw rectangle around the face
+        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+        
+        # Extract the detected face region
+        detected_face = frame[y:y + h, x:x + w]
+
+        # Compare the detected face to the known faces in the 'uploads' folder
+        matched = False
+        for known_face, name in zip(known_faces, known_names):
+            similarity = compare_faces(detected_face, known_face)
+            if similarity > 0.7:  # Threshold for face match
+                cv2.putText(frame, f'Match Found: {name}', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+                matched = True
+                break
+        
+        if not matched:
+            cv2.putText(frame, 'No Match', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 0, 255), 2)
+    
+    # Display the frame with face detection
+    cv2.imshow('Webcam Feed', frame)
+    
+    # Break the loop if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()

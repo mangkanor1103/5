@@ -272,48 +272,114 @@
             </div>
         </div>
     </div>
-
-    <!-- Modal for Login -->
-    <div class="modal fade" id="myModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #28a745; color: white;">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">User   Login</h4>
-                </div>
-                <div class="modal-body">
-                    <form class="form-horizontal" action="login.php?q=index.php" method="POST">
-                        <div class="form-group">
-                            <label class="control-label" for="email">Email</label>
-                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                            <div>
-                                <input id="email" name="email" placeholder="Email" class="form-control" type="email">
-                            </div>
+<!-- Modal for Login -->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #28a745; color: white;">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">User Login</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" action="login.php?q=index.php" method="POST">
+                    <div class="form-group">
+                        <label class="control-label" for="email">Email</label>
+                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                        <div>
+                            <input id="email" name="email" placeholder="Email" class="form-control" type="email">
                         </div>
-                        <div class="form-group">
-                            <label class="control-label" for="password">Password</label>
-                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                            <div>
-                                <input id="password" name="password" placeholder="Password" class="form-control" type="password">
-                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label" for="password">Password</label>
+                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                        <div>
+                            <input id="password" name="password" placeholder="Password" class="form-control" type="password">
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-register" data-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-register">Log in</button>
-                        </div>
-                        <!-- Inside your modal-body under the form -->
-<div class="text-center mb-2">
-    <button class="btn btn-outline-success" onclick="startFaceLogin()">Login using Face</button>
-</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-register" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-register">Log in</button>
+                    </div>
+                </form>
 
-<video id="faceCam" width="100%" autoplay style="display:none;"></video>
-<canvas id="faceCanvas" style="display:none;"></canvas>
-
-                    </form>
+                <!-- Face Login Button -->
+                <div class="text-center mb-2">
+                    <button class="btn btn-outline-success" onclick="openFaceLoginModal()">Login using Face</button>
                 </div>
             </div>
         </div>
     </div>
+</div>
+<!-- Modal for Face Login (Real-time Camera Feed) -->
+<div class="modal fade" id="faceLoginModal" tabindex="-1" role="dialog" aria-labelledby="faceLoginModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #28a745; color: white;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Face Login</h4>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <video id="faceCam" width="100%" autoplay style="display:block;"></video>
+                    <canvas id="faceCanvas" style="display:none;"></canvas>
+                    <div id="statusMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const videoElement = document.getElementById("faceCam");
+    const canvasElement = document.getElementById("faceCanvas");
+    const context = canvasElement.getContext('2d');
+
+    // Set up the camera feed
+    async function startCamera() {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        videoElement.srcObject = stream;
+    }
+
+    // Capture frame and send to the server for recognition
+    function captureAndMatchFace() {
+        canvasElement.width = videoElement.videoWidth;
+        canvasElement.height = videoElement.videoHeight;
+        context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+        // Send the image data to the server
+        canvasElement.toBlob((blob) => {
+            let formData = new FormData();
+            formData.append('image', blob);
+            
+            // Send to server via Fetch API
+            fetch('/face-recognition', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.match) {
+                    document.getElementById('statusMessage').innerText = "Face Matched!";
+                } else {
+                    document.getElementById('statusMessage').innerText = "No Match Found.";
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    }
+
+    // Start camera feed when modal is opened
+    $('#faceLoginModal').on('shown.bs.modal', function() {
+        startCamera();
+    });
+
+    // Capture and match the face every 2 seconds
+    setInterval(captureAndMatchFace, 2000);
+</script>
+
+
 
     <!-- Modal for Developers -->
     <div class="modal fade" id="developers">
@@ -404,6 +470,74 @@
         video.style.display = 'none';
         document.getElementById('captureBtn').style.display = 'none';
     }
+    // Open the Face Login Modal and start the webcam feed
+function openFaceLoginModal() {
+    // Show the modal
+    $('#faceLoginModal').modal('show');
+
+    // Start the video feed
+    startFaceLogin();
+}
+
+// Start webcam and video feed
+function startFaceLogin() {
+    const videoElement = document.getElementById("faceCam");
+    const canvasElement = document.getElementById("faceCanvas");
+    const statusMessage = document.getElementById("statusMessage");
+
+    // Set up webcam stream
+    navigator.mediaDevices.getUserMedia({
+        video: true
+    }).then(stream => {
+        videoElement.srcObject = stream;
+        videoElement.style.display = 'block'; // Show the video element
+        statusMessage.innerText = "Please position your face in front of the camera for recognition.";
+
+        // Start detecting faces once the video is ready
+        videoElement.onplay = function () {
+            detectFace();
+        };
+    }).catch(err => {
+        console.log("Error accessing webcam:", err);
+        statusMessage.innerText = "Unable to access the camera.";
+    });
+}
+
+// Perform face recognition and compare with saved faces
+function detectFace() {
+    const videoElement = document.getElementById("faceCam");
+    const canvasElement = document.getElementById("faceCanvas");
+    const context = canvasElement.getContext('2d');
+    
+    // Set canvas size to match the video
+    canvasElement.width = videoElement.videoWidth;
+    canvasElement.height = videoElement.videoHeight;
+
+    // Draw the current frame from the video to the canvas
+    context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
+
+    // Here you would integrate your face recognition logic.
+    // Example: Detect face and compare it with saved photos in the "uploads" folder.
+
+    // After recognition, show status messages or move to the next steps.
+    // For demo purposes, assume a match occurs:
+    setTimeout(() => {
+        statusMessage.innerText = "Face recognized successfully!";
+        // You can add a redirect or proceed with login actions here
+    }, 2000);
+}
+
+// Close modal and stop webcam
+function closeFaceLoginModal() {
+    $('#faceLoginModal').modal('hide');
+    const videoElement = document.getElementById("faceCam");
+    const stream = videoElement.srcObject;
+    const tracks = stream.getTracks();
+
+    tracks.forEach(track => track.stop()); // Stop the video stream
+    videoElement.srcObject = null;
+}
+
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
