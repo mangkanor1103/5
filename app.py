@@ -5,6 +5,7 @@ import mediapipe as mp
 import numpy as np
 import math
 import os
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow INFO and WARNING messages
 
 app = Flask(__name__)
@@ -26,33 +27,26 @@ face_mesh = mp_face_mesh.FaceMesh(
 prev_x = None
 movement_direction = "CENTER"
 gaze_direction = "CENTER"
+mouth_status = "CLOSED"
 
 def calculate_gaze_direction(face_landmarks, image_shape):
     # Get specific landmarks for left and right eye
-    # Left eye corners (points 33 and 133)
     left_eye_left = face_landmarks.landmark[33]
     left_eye_right = face_landmarks.landmark[133]
     
-    # Right eye corners (points 362 and 263)
     right_eye_left = face_landmarks.landmark[362]
     right_eye_right = face_landmarks.landmark[263]
     
-    # Nose tip (point 1)
     nose_tip = face_landmarks.landmark[1]
     
-    # Convert normalized coordinates to pixel coordinates
     height, width = image_shape[:2]
     nose_x = int(nose_tip.x * width)
     left_eye_center_x = int((left_eye_left.x + left_eye_right.x) / 2 * width)
     right_eye_center_x = int((right_eye_left.x + right_eye_right.x) / 2 * width)
     
-    # Calculate eye line midpoint
     eye_line_center_x = (left_eye_center_x + right_eye_center_x) // 2
-    
-    # Calculate horizontal difference between nose and eye line center
     horizontal_diff = nose_x - eye_line_center_x
     
-    # Increased threshold for more tolerance
     threshold = 20
     
     if horizontal_diff > threshold:
@@ -61,8 +55,22 @@ def calculate_gaze_direction(face_landmarks, image_shape):
         return "LEFT"
     return "CENTER"
 
+def check_mouth_open(face_landmarks, image_shape, threshold=15):
+    height, width = image_shape[:2]
+
+    # Use inner lips landmarks for more consistent detection
+    upper_lip = face_landmarks.landmark[13]
+    lower_lip = face_landmarks.landmark[14]
+
+    upper_lip_y = int(upper_lip.y * height)
+    lower_lip_y = int(lower_lip.y * height)
+
+    lip_distance = abs(lower_lip_y - upper_lip_y)
+
+    return "OPEN" if lip_distance > threshold else "CLOSED"
+
 def generate_frames():
-    global prev_x, movement_direction, gaze_direction
+    global prev_x, movement_direction, gaze_direction, mouth_status
     cap = cv2.VideoCapture(0)
     frame_width = int(cap.get(3))
     center_x = frame_width // 2
@@ -72,13 +80,10 @@ def generate_frames():
         if not success:
             break
 
-        # Flip the frame horizontally for a later selfie-view display
         frame = cv2.flip(frame, 1)
         
-        # Convert BGR image to RGB
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         
-        # Process the frame and detect facial landmarks
         results = face_mesh.process(frame_rgb)
 
         if results.multi_face_landmarks:
@@ -106,11 +111,10 @@ def generate_frames():
                 x = int(nose_tip.x * frame.shape[1])
                 y = int(nose_tip.y * frame.shape[0])
 
-                # Determine movement direction based on face position
                 if prev_x is not None:
-                    if x < center_x - 100:  # Increased threshold
+                    if x < center_x - 100:
                         movement_direction = "LEFT"
-                    elif x > center_x + 100:  # Increased threshold
+                    elif x > center_x + 100:
                         movement_direction = "RIGHT"
                     else:
                         movement_direction = "CENTER"
@@ -119,27 +123,30 @@ def generate_frames():
 
                 # Calculate gaze direction
                 new_gaze = calculate_gaze_direction(face_landmarks, frame.shape)
-                
-                # Only update gaze direction if face is centered
                 if movement_direction == "CENTER":
                     gaze_direction = new_gaze
                 else:
-                    gaze_direction = "CENTER"  # Reset gaze when face is not centered
+                    gaze_direction = "CENTER"
 
-                # Display movement and gaze information
+                # Check mouth status
+                mouth_status = check_mouth_open(face_landmarks, frame.shape)
+
+                # Display movement, gaze, and mouth status information
                 cv2.putText(frame, f"Face: {movement_direction}", 
                            (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 
                            0.7, (0, 255, 0), 2)
                 cv2.putText(frame, f"Gaze: {gaze_direction}", 
                            (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 
                            0.7, (255, 0, 0), 2)
+                cv2.putText(frame, f"Mouth: {mouth_status}", 
+                           (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 
+                           0.7, (0, 0, 255), 2)
 
         else:
-            # Reset directions when no face is detected
             movement_direction = "CENTER"
             gaze_direction = "CENTER"
+            mouth_status = "CLOSED"
 
-        # Encode the frame for streaming
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         
@@ -153,12 +160,12 @@ def video_feed():
 
 @app.route('/face_position')
 def face_position():
-    global movement_direction, gaze_direction
-    # Only return non-center gaze direction if face is centered
+    global movement_direction, gaze_direction, mouth_status
     response_gaze = gaze_direction if movement_direction == "CENTER" else "CENTER"
     return jsonify({
         "position": movement_direction,
-        "gaze": response_gaze
+        "gaze": response_gaze,
+        "mouth": mouth_status
     })
 
 if __name__ == '__main__':

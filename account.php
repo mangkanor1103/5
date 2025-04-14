@@ -338,7 +338,6 @@ if (!isset($_SESSION['email'])) {
         </div>
     </div>
 </div>
-
 <script>
 function checkFacePosition() {
     fetch('http://127.0.0.1:5000/face_position')
@@ -346,9 +345,11 @@ function checkFacePosition() {
         .then(data => {
             console.log("Face Position:", data.position);
             console.log("Gaze Direction:", data.gaze);
+            console.log("Mouth Status:", data.mouth);
 
             if (data.position === "LEFT" || data.position === "RIGHT" ||
-                data.gaze === "LEFT" || data.gaze === "RIGHT") {
+                data.gaze === "LEFT" || data.gaze === "RIGHT" ||
+                data.mouth === "OPEN") {
 
                 let warnings = parseInt(sessionStorage.getItem("warnings")) || 0;
                 warnings++;
@@ -356,8 +357,8 @@ function checkFacePosition() {
 
                 if (warnings >= 3) {
                     clearInterval(faceDetectionInterval);
-                    sessionStorage.clear(); // reset if needed
-                    window.location.href = "logout.php"; // your logout page
+                    sessionStorage.clear(); // clear local sessionStorage
+                    window.location.href = "logout.php"; // call PHP logout
                 } else {
                     clearInterval(faceDetectionInterval);
                     window.location.href = "warning.html"; // show warning
@@ -366,27 +367,27 @@ function checkFacePosition() {
         })
         .catch(error => console.error("Error fetching face position:", error));
 }
-const faceDetectionInterval = setInterval(checkFacePosition, 1000);
 
+let faceDetectionInterval = setInterval(checkFacePosition, 1000);
 
-    function startFaceDetection() {
-        if (!faceDetectionInterval) {
-            faceDetectionInterval = setInterval(checkFacePosition, 1000);
-        }
+function startFaceDetection() {
+    if (!faceDetectionInterval) {
+        faceDetectionInterval = setInterval(checkFacePosition, 1000);
     }
+}
 
-    function restartFaceDetection() {
-        if (sessionStorage.getItem("faceDetected") === "true") {
-            sessionStorage.removeItem("faceDetected");
-            setTimeout(() => {
-                startFaceDetection();
-            }, 500);
-        } else {
+function restartFaceDetection() {
+    if (sessionStorage.getItem("faceDetected") === "true") {
+        sessionStorage.removeItem("faceDetected");
+        setTimeout(() => {
             startFaceDetection();
-        }
+        }, 500);
+    } else {
+        startFaceDetection();
     }
+}
 
-    window.onload = restartFaceDetection;
+window.onload = restartFaceDetection;
 </script>
 
 </body>
