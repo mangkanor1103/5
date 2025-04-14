@@ -174,70 +174,84 @@
     </a>
 </div>
 
-    <div class="container">
-        <div class="panel">
-            <form class="form-horizontal" name="form" action="sign.php?q=account.php" onSubmit="return validateForm()" method="POST">
-                <fieldset>
-                    <legend class="text-center" style="color: #28a745;"><b>Register Now</b></legend>
+<div class="container">
+    <div class="panel">
+        <form class="form-horizontal" name="form" action="sign.php?q=account.php" 
+              onSubmit="return validateForm()" method="POST" enctype="multipart/form-data">
+            <fieldset>
+                <legend class="text-center" style="color: #28a745;"><b>Register Now</b></legend>
 
-                    <div class="row">
-                        <div class="col-md-6 form-row">
+                <div class="row">
+                    <div class="col-md-6 form-row">
                         <label class="control-label" for="name">Full Name</label>
                         <span class="input-group-text"><i class="fa fa-user"></i></span>
-                            <input id="name" name="name" placeholder="Fullname" class="form-control" type="text" required>
-                        </div>
-                        <div class="col-md-6 form-row">
-                            <label class="control-label" for="gender">Gender</label>
-                            <span class="input-group-text"><i class="fa fa-venus-mars"></i></span>
-                            <select id="gender" name="gender" class="form-control" required>
-                                <option value="">Select Gender</option>
-                                <option value="M">Male</option>
-                                <option value="F">Female</option>
-                            </select>
-                        </div>
+                        <input id="name" name="name" placeholder="Fullname" class="form-control" type="text" required>
                     </div>
+                    <div class="col-md-6 form-row">
+                        <label class="control-label" for="gender">Gender</label>
+                        <span class="input-group-text"><i class="fa fa-venus-mars"></i></span>
+                        <select id="gender" name="gender" class="form-control" required>
+                            <option value="">Select Gender</option>
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                        </select>
+                    </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-6 form-row">
-                            <label class="control-label" for="college">Year and Section</label>
-                            <span class="input-group-text"><i class="fa fa-school"></i></span>
-                            <input id="college" name="college" placeholder="Year and Section" class="form-control" type="text" required>
-                        </div>
-                        <div class="col-md-6 form-row">
-                            <label class="control-label" for="email">Email ID</label>
-                            <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                            <input id="email" name="email" placeholder="Email ID" class="form-control" type="email" required>
-                        </div>
+                <div class="row">
+                    <div class="col-md-6 form-row">
+                        <label class="control-label" for="college">Year and Section</label>
+                        <span class="input-group-text"><i class="fa fa-school"></i></span>
+                        <input id="college" name="college" placeholder="Year and Section" class="form-control" type="text" required>
                     </div>
+                    <div class="col-md-6 form-row">
+                        <label class="control-label" for="email">Email ID</label>
+                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                        <input id="email" name="email" placeholder="Email ID" class="form-control" type="email" required>
+                    </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-6 form-row">
-                            <label class="control-label" for="mob">Contact Number</label>
-                            <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                            <input id="mob" name="mob" placeholder="Contact Number" class="form-control" type="number" required>
-                        </div>
-                        <div class="col-md-6 form-row">
-                            <label class="control-label" for="password">Password</label>
-                            <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                            <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
-                        </div>
+                <div class="row">
+                    <div class="col-md-6 form-row">
+                        <label class="control-label" for="mob">Contact Number</label>
+                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
+                        <input id="mob" name="mob" placeholder="Contact Number" class="form-control" type="number" required>
                     </div>
+                    <div class="col-md-6 form-row">
+                        <label class="control-label" for="password">Password</label>
+                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                        <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
+                    </div>
+                </div>
 
-                    <div class="row">
-                        <div class="col-md-6 form-row">
-                            <label class="control-label" for="cpassword">Confirm Password</label>
-                            <span class="input-group-text"><i class="fa fa-check-circle"></i></span>
-                            <input id="cpassword" name="cpassword" placeholder="Confirmation Password" class="form-control" type="password" required>
-                        </div>
+                <div class="row">
+                    <div class="col-md-6 form-row">
+                        <label class="control-label" for="cpassword">Confirm Password</label>
+                        <span class="input-group-text"><i class="fa fa-check-circle"></i></span>
+                        <input id="cpassword" name="cpassword" placeholder="Confirmation Password" class="form-control" type="password" required>
                     </div>
-
-                    <div class="form-group text-center">
-                        <input type="submit" class="btn btn-register" value="Register"/>
-                    </div>
-                </fieldset>
-            </form>
-        </div>
+                    <div class="col-md-6 form-row">
+    <label class="control-label">Profile Photo</label>
+    <div class="mb-2">
+        <video id="camera" autoplay playsinline width="100%" style="display:none;"></video>
+        <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="startCamera()">📷 Upload Photo</button>
+        <button type="button" class="btn btn-success btn-sm mt-2" onclick="capture()" style="display:none;" id="captureBtn">✅ Capture</button>
     </div>
+    <canvas id="snapshot" style="display:none;"></canvas>
+    <input type="hidden" name="photo_data" id="photo_data" required>
+    <img id="preview" src="#" alt="Captured photo" style="display:none; max-width: 100%; margin-top: 10px; border: 1px solid #ccc;">
+</div>
+
+                </div>
+
+                <div class="form-group text-center">
+                    <input type="submit" class="btn btn-register" value="Register"/>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
 
     <div class="footer">
         <div class="row">
@@ -273,20 +287,28 @@
                             <label class="control-label" for="email">Email</label>
                             <span class="input-group-text"><i class="fa fa-envelope"></i></span>
                             <div>
-                                <input id="email" name="email" placeholder="Email" class="form-control" type="email" required>
+                                <input id="email" name="email" placeholder="Email" class="form-control" type="email">
                             </div>
                         </div>
                         <div class="form-group">
                             <label class="control-label" for="password">Password</label>
                             <span class="input-group-text"><i class="fa fa-lock"></i></span>
                             <div>
-                                <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
+                                <input id="password" name="password" placeholder="Password" class="form-control" type="password">
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-register" data-dismiss="modal">Close</button>
                             <button type="submit" class="btn btn-register">Log in</button>
                         </div>
+                        <!-- Inside your modal-body under the form -->
+<div class="text-center mb-2">
+    <button class="btn btn-outline-success" onclick="startFaceLogin()">Login using Face</button>
+</div>
+
+<video id="faceCam" width="100%" autoplay style="display:none;"></video>
+<canvas id="faceCanvas" style="display:none;"></canvas>
+
                     </form>
                 </div>
             </div>
@@ -347,6 +369,94 @@
             </div>
         </div>
     </div>
+    <script>
+    let video = null;
+    let canvas = null;
+    let photo_data_input = null;
+
+    function startCamera() {
+        video = document.getElementById('camera');
+        canvas = document.getElementById('snapshot');
+        photo_data_input = document.getElementById('photo_data');
+        const captureBtn = document.getElementById('captureBtn');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+                video.style.display = 'block';
+                captureBtn.style.display = 'inline-block';
+            })
+            .catch(err => {
+                alert("Camera access denied: " + err);
+            });
+    }
+
+    function capture() {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataURL = canvas.toDataURL('image/png');
+        document.getElementById('preview').src = dataURL;
+        document.getElementById('preview').style.display = 'block';
+        photo_data_input.value = dataURL;
+        video.style.display = 'none';
+        document.getElementById('captureBtn').style.display = 'none';
+    }
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let video = document.getElementById('faceCam');
+    let canvas = document.getElementById('faceCanvas');
+    let context = canvas.getContext('2d');
+
+    // Function to start face login process
+    function startFaceLogin() {
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then((stream) => {
+                // Show video and start the camera stream
+                video.style.display = 'block';
+                video.srcObject = stream;
+
+                // Wait for the camera to warm up (you can adjust this timing)
+                setTimeout(() => {
+                    // Capture an image from the video stream
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    let faceData = canvas.toDataURL('image/jpeg'); // Capture the image as base64
+
+                    // Send the captured image to the server
+                    fetch('face_login.py', {
+                        method: 'POST',
+                        body: JSON.stringify({ image: faceData }),
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            alert('Face login successful!');
+                            window.location.href = 'index.php'; // Redirect after successful login
+                        } else {
+                            alert('Face not recognized.');
+                        }
+                    })
+                    .catch((err) => {
+                        console.error('Error during face recognition:', err);
+                        alert('An error occurred during face recognition.');
+                    });
+                }, 3000); // Wait 3 seconds before capturing the photo
+            })
+            .catch((err) => {
+                console.error('Camera error:', err);
+                alert("Unable to access camera.");
+            });
+    }
+
+    // Attach the startFaceLogin function to your button
+    document.getElementById('startFaceLoginBtn').addEventListener('click', startFaceLogin);
+});
+</script>
+
 
 </body>
 </html>
