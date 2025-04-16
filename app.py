@@ -1,9 +1,7 @@
-from flask import Flask, Response, jsonify
+from flask import Flask, Response, jsonify, send_file
 from flask_cors import CORS
 import cv2
 import mediapipe as mp
-import numpy as np
-import math
 import os
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TensorFlow INFO and WARNING messages
@@ -28,37 +26,41 @@ prev_x = None
 movement_direction = "CENTER"
 gaze_direction = "CENTER"
 mouth_status = "CLOSED"
+warning_image_path = "warnings/latest_warning.jpeg"  # Fixed file name for single warning image
+
+# Ensure the warnings folder exists
+warnings_folder = "warnings"
+if not os.path.exists(warnings_folder):
+    os.makedirs(warnings_folder)
+
 
 def calculate_gaze_direction(face_landmarks, image_shape):
     # Get specific landmarks for left and right eye
     left_eye_left = face_landmarks.landmark[33]
     left_eye_right = face_landmarks.landmark[133]
-    
     right_eye_left = face_landmarks.landmark[362]
     right_eye_right = face_landmarks.landmark[263]
-    
     nose_tip = face_landmarks.landmark[1]
-    
+
     height, width = image_shape[:2]
     nose_x = int(nose_tip.x * width)
     left_eye_center_x = int((left_eye_left.x + left_eye_right.x) / 2 * width)
     right_eye_center_x = int((right_eye_left.x + right_eye_right.x) / 2 * width)
-    
+
     eye_line_center_x = (left_eye_center_x + right_eye_center_x) // 2
     horizontal_diff = nose_x - eye_line_center_x
-    
+
     threshold = 20
-    
+
     if horizontal_diff > threshold:
         return "RIGHT"
     elif horizontal_diff < -threshold:
         return "LEFT"
     return "CENTER"
 
+
 def check_mouth_open(face_landmarks, image_shape, threshold=15):
     height, width = image_shape[:2]
-
-    # Use inner lips landmarks for more consistent detection
     upper_lip = face_landmarks.landmark[13]
     lower_lip = face_landmarks.landmark[14]
 
@@ -66,8 +68,19 @@ def check_mouth_open(face_landmarks, image_shape, threshold=15):
     lower_lip_y = int(lower_lip.y * height)
 
     lip_distance = abs(lower_lip_y - upper_lip_y)
-
     return "OPEN" if lip_distance > threshold else "CLOSED"
+
+
+def save_warning_image(frame):
+    """Save only one warning image by overwriting the existing one."""
+    # Delete the previous warning image if it exists
+    if os.path.exists(warning_image_path):
+        os.remove(warning_image_path)
+
+    # Save the current warning image
+    cv2.imwrite(warning_image_path, frame)
+    print(f"Warning image saved: {warning_image_path}")
+
 
 def generate_frames():
     global prev_x, movement_direction, gaze_direction, mouth_status
@@ -81,9 +94,9 @@ def generate_frames():
             break
 
         frame = cv2.flip(frame, 1)
-        
+
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        
+
         results = face_mesh.process(frame_rgb)
 
         if results.multi_face_landmarks:
@@ -96,20 +109,10 @@ def generate_frames():
                     landmark_drawing_spec=None,
                     connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_tesselation_style()
                 )
-                
-                # Draw the face contours
-                mp_drawing.draw_landmarks(
-                    image=frame,
-                    landmark_list=face_landmarks,
-                    connections=mp_face_mesh.FACEMESH_CONTOURS,
-                    landmark_drawing_spec=None,
-                    connection_drawing_spec=mp_drawing_styles.get_default_face_mesh_contours_style()
-                )
 
                 # Calculate face position
                 nose_tip = face_landmarks.landmark[1]
                 x = int(nose_tip.x * frame.shape[1])
-                y = int(nose_tip.y * frame.shape[0])
 
                 if prev_x is not None:
                     if x < center_x - 100:
@@ -122,41 +125,27 @@ def generate_frames():
                 prev_x = x
 
                 # Calculate gaze direction
-                new_gaze = calculate_gaze_direction(face_landmarks, frame.shape)
-                if movement_direction == "CENTER":
-                    gaze_direction = new_gaze
-                else:
-                    gaze_direction = "CENTER"
+                gaze_direction = calculate_gaze_direction(face_landmarks, frame.shape)
 
                 # Check mouth status
                 mouth_status = check_mouth_open(face_landmarks, frame.shape)
 
-                # Display movement, gaze, and mouth status information
-                cv2.putText(frame, f"Face: {movement_direction}", 
-                           (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 
-                           0.7, (0, 255, 0), 2)
-                cv2.putText(frame, f"Gaze: {gaze_direction}", 
-                           (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 
-                           0.7, (255, 0, 0), 2)
-                cv2.putText(frame, f"Mouth: {mouth_status}", 
-                           (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 
-                           0.7, (0, 0, 255), 2)
-
-        else:
-            movement_direction = "CENTER"
-            gaze_direction = "CENTER"
-            mouth_status = "CLOSED"
+                # If a warning condition is met, save the frame
+                if movement_direction != "CENTER" or gaze_direction != "CENTER" or mouth_status == "OPEN":
+                    save_warning_image(frame)
 
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
-        
+
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
 
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(),
-                   mimetype='multipart/x-mixed-replace; boundary=frame')
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 @app.route('/face_position')
 def face_position():
@@ -168,6 +157,15 @@ def face_position():
         "mouth": mouth_status
     })
 
+
+@app.route('/get_warning_image')
+def get_warning_image():
+    """Serve the latest warning image to the client."""
+    if os.path.exists(warning_image_path):
+        return send_file(warning_image_path, mimetype='image/jpeg')
+    return jsonify({"error": "No warning image available"}), 404
+
+
 if __name__ == '__main__':
     try:
         app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
@@ -175,25 +173,3 @@ if __name__ == '__main__':
         print(f"Error: {e}")
     finally:
         cv2.destroyAllWindows()
-
-        
-from flask import Flask, jsonify
-import os
-import sys
-import signal
-
-app = Flask(__name__)
-
-@app.route('/face_position')
-def face_position():
-    # Your existing logic to return face position
-    return jsonify({"position": "LEFT", "gaze": "RIGHT", "mouth": "CLOSED"})
-
-@app.route('/restart', methods=['POST'])
-def restart_server():
-    # Logic to restart the server
-    os.execv(sys.executable, ['python'] + sys.argv)  # Restart the server
-    return jsonify({"status": "restarting"}), 200
-
-if __name__ == '__main__':
-    app.run(debug=True)

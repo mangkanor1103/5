@@ -408,7 +408,7 @@ function checkFacePosition() {
                         })
                         .catch(error => console.error("Error:", error));
                 } else {
-                    window.location.href = "warning.html";
+                    window.location.href = "warning.php";
                 }
             }
         })
