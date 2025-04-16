@@ -1,3 +1,32 @@
+<?php
+// Start the session
+session_start();
+
+// Include the database connection
+require_once 'dbConnection.php';
+
+// Check if the user is logged in
+if (!isset($_SESSION['email'])) {
+    header("location:index.php");
+    exit(); // Ensure no further code is executed
+} else {
+    $name = $_SESSION['name'];
+    $email = $_SESSION['email']; // Initialize the email variable
+}
+
+// Automatically save the warning when the page is loaded
+$timestamp = date('Y-m-d H:i:s'); // Get the current timestamp
+
+// Insert the warning into the database using a simple query
+$sql = "INSERT INTO warning (timestamp, email) VALUES ('$timestamp', '$email')";
+
+if ($con->query($sql) === TRUE) {
+    $saveMessage = "Warning saved successfully!";
+} else {
+    $saveMessage = "Failed to save warning: " . $con->error;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,48 +35,80 @@
     <title>Warning</title>
     <style>
         body { 
-            text-align: center; 
+            display: flex; 
+            flex-direction: row; 
+            justify-content: space-between; 
+            align-items: center; 
             font-family: Arial, sans-serif; 
-            padding: 50px; 
+            margin: 0; 
+            padding: 0; 
+            height: 100vh; 
             background-color: red; 
             color: white; 
+        }
+        .left { 
+            flex: 1; 
+            padding: 20px; 
+            text-align: left; 
+        }
+        .right { 
+            flex: 1; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 20px; 
         }
         h1 { 
             font-size: 40px; 
         }
         p { 
             font-size: 20px; 
+            margin: 20px 0; 
         }
-        a { 
-            color: yellow; 
+        button { 
+            margin-top: 20px; 
+            padding: 10px 20px; 
             font-size: 18px; 
-            text-decoration: underline; 
+            color: white; 
+            background-color: black; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background-color: gray; 
         }
         img { 
-            margin-top: 20px; 
-            max-width: 80%; 
-            height: auto; 
+            max-width: 100%; 
+            max-height: 100%; 
             border: 5px solid white; 
             border-radius: 10px; 
+        }
+        #noImageMessage { 
+            text-align: center; 
         }
     </style>
 </head>
 <body>
-    <h1>⚠ Warning ⚠</h1>
-    <p>Your face moved out of the allowed area! Please keep your face centered.</p>
-    <div>
-        <img id="warningImage" src="" alt="Captured Warning Image">
+    <div class="left">
+        <h1>⚠ Warning ⚠</h1>
+        <p>Your face has moved out of the allowed area! Please keep your face centered for the system to work properly.</p>
+        <p id="saveMessage"><?php echo htmlspecialchars($saveMessage); ?></p>
+        <button id="goBackButton">Go Back</button>
     </div>
-    <div id="noImageMessage" style="display: none;">
-        <p>No warning image available. Please try again later.</p>
+    <div class="right">
+        <img id="warningImage" src="" alt="Captured Warning Image">
+        <div id="noImageMessage" style="display: none;">
+            <p>No warning image is currently available. Please try again later.</p>
+        </div>
     </div>
 
     <script>
-        // Fetch and display the latest warning image
         document.addEventListener("DOMContentLoaded", () => {
             const imgElement = document.getElementById("warningImage");
             const noImageMessage = document.getElementById("noImageMessage");
 
+            // Fetch and display the latest warning image
             fetch('http://127.0.0.1:5000/get_warning_image')
                 .then(response => {
                     if (response.ok) {
@@ -66,10 +127,11 @@
                     noImageMessage.style.display = "block"; // Show the fallback message
                 });
 
-            // Automatically go back after 5 seconds
-            setTimeout(() => {
+            // Add event listener to the "Go Back" button
+            const goBackButton = document.getElementById("goBackButton");
+            goBackButton.addEventListener("click", () => {
                 window.history.back();
-            }, 5000);
+            });
         });
     </script>
 </body>

@@ -39,6 +39,7 @@
                     <a href="dash.php?q=2" class="p-4 hover:bg-gray-200">User Rankings</a>
                     <a href="dash.php?q=3" class="p-4 hover:bg-gray-200">Feedback</a>
                     <a href="dash.php?q=4" class="p-4 hover:bg-gray-200">Add Exams</a>
+                    <a href="user.php" class="p-4 hover:bg-gray-200">Warnings</a>
                 </div>
             </div>
         </div>

@@ -383,30 +383,49 @@ function checkFacePosition() {
                 sessionStorage.setItem("warnings", warnings);
 
                 if (warnings >= 3) {
-                    clearInterval(faceDetectionInterval);
-                    sessionStorage.clear(); // Clear warnings
+    clearInterval(faceDetectionInterval);
+    sessionStorage.clear(); // Clear warnings
 
-                    // Logout and restart server
-                    fetch('logout.php')
-                        .then(logoutResponse => {
-                            if (logoutResponse.ok) {
-                                console.log("Logged out successfully");
-                                setTimeout(() => {
-                                    window.location.reload(); // Refresh the page
-                                }, 1000);
-                                return fetch('http://127.0.0.1:5000/restart', { method: 'POST' });
-                            } else {
-                                console.error("Logout failed");
-                            }
-                        })
-                        .then(restartResponse => {
-                            if (restartResponse.ok) {
-                                console.log("Server restarting...");
-                            } else {
-                                console.error("Server restart failed");
-                            }
-                        })
-                        .catch(error => console.error("Error:", error));
+    // Call the backend to disable the user
+    fetch('disable_user.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: '<?php echo $_SESSION["email"]; ?>' }), // Send the user's email
+    })
+        .then(disableResponse => {
+            if (disableResponse.ok) {
+                console.log("User disabled successfully");
+
+                // Logout the user
+                return fetch('logout.php');
+            } else {
+                throw new Error("Failed to disable user");
+            }
+        })
+        .then(logoutResponse => {
+            if (logoutResponse.ok) {
+                console.log("Logged out successfully");
+                setTimeout(() => {
+                    window.location.reload(); // Refresh the page
+                }, 1000);
+
+                // Restart the application or server
+                return fetch('http://127.0.0.1:5000/restart', { method: 'POST' });
+            } else {
+                console.error("Logout failed");
+            }
+        })
+        .then(restartResponse => {
+            if (restartResponse.ok) {
+                console.log("Server restarting...");
+            } else {
+                console.error("Server restart failed");
+            }
+        })
+        .catch(error => console.error("Error:", error));
+
                 } else {
                     window.location.href = "warning.php";
                 }
