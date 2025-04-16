@@ -10,6 +10,11 @@ if (!isset($_SESSION['email'])) {
     $name = $_SESSION['name'];
     $email = $_SESSION['email']; // Initialize the email variable
 }
+
+// Track if the user is currently taking an exam
+if (!isset($_SESSION['exam_active'])) {
+    $_SESSION['exam_active'] = false; // Default to inactive
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -339,13 +344,29 @@ if (!isset($_SESSION['email'])) {
     </div>
 </div>
 
+<?php
+if (@$_GET['q'] == 'quiz' && @$_GET['step'] == 2) {
+    // User starts the quiz
+    $_SESSION['exam_active'] = true;
+    $eid = @$_GET['eid'];
+    $sn = @$_GET['n'];
+    $total = @$_GET['t'];
+    // Fetch questions and display the quiz interface
+} else {
+    // User is not taking a quiz
+    $_SESSION['exam_active'] = false;
+}
+?>
+
 <script>
+// JavaScript to manage face detection
+
+let faceDetectionInterval;
+
 function checkFacePosition() {
     fetch('http://127.0.0.1:5000/face_position')
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Server not reachable');
-            }
+            if (!response.ok) throw new Error('Server not reachable');
             return response.json();
         })
         .then(data => {
@@ -363,50 +384,39 @@ function checkFacePosition() {
 
                 if (warnings >= 3) {
                     clearInterval(faceDetectionInterval);
-                    sessionStorage.clear(); // clear local sessionStorage
-                    
-                    // Call the logout PHP script
+                    sessionStorage.clear(); // Clear warnings
+
+                    // Logout and restart server
                     fetch('logout.php')
                         .then(logoutResponse => {
                             if (logoutResponse.ok) {
-                                console.log("User  logged out successfully.");
+                                console.log("Logged out successfully");
                                 setTimeout(() => {
-                            window.location.reload(); // Refresh the page
-                        }, 1000)
-                                
-                                // After logout, restart the server
-                                fetch('http://127.0.0.1:5000/restart', {
-                                    method: 'POST'
-                                })
-                                .then(restartResponse => {
-                                    if (restartResponse.ok) {
-                                        console.log("Server is restarting...");
-                                        // Optionally redirect to a different page or show a message
-
-                                    } else {
-                                        console.error("Failed to restart server");
-                                    }
-                                })
-                                .catch(error => console.error("Error restarting server:", error));
+                                    window.location.reload(); // Refresh the page
+                                }, 1000);
+                                return fetch('http://127.0.0.1:5000/restart', { method: 'POST' });
                             } else {
-                                console.error("Failed to log out user");
+                                console.error("Logout failed");
                             }
                         })
-                        .catch(error => console.error("Error during logout:", error));
+                        .then(restartResponse => {
+                            if (restartResponse.ok) {
+                                console.log("Server restarting...");
+                            } else {
+                                console.error("Server restart failed");
+                            }
+                        })
+                        .catch(error => console.error("Error:", error));
                 } else {
-                    clearInterval(faceDetectionInterval);
-                    window.location.href = "warning.html"; // show warning
+                    window.location.href = "warning.html";
                 }
             }
         })
         .catch(error => {
             console.error("Error fetching face position:", error);
-            // Optionally, you can implement a retry mechanism here
             setTimeout(checkFacePosition, 5000); // Retry after 5 seconds
         });
 }
-
-let faceDetectionInterval = setInterval(checkFacePosition, 1000);
 
 function startFaceDetection() {
     if (!faceDetectionInterval) {
@@ -414,18 +424,20 @@ function startFaceDetection() {
     }
 }
 
-function restartFaceDetection() {
-    if (sessionStorage.getItem("faceDetected") === "true") {
-        sessionStorage.removeItem("faceDetected");
-        setTimeout(() => {
-            startFaceDetection();
-        }, 500);
-    } else {
-        startFaceDetection();
-    }
+function stopFaceDetection() {
+    clearInterval(faceDetectionInterval);
+    faceDetectionInterval = null;
 }
 
-window.onload = restartFaceDetection;
+// Start/stop face detection based on session state
+window.onload = () => {
+    <?php if ($_SESSION['exam_active']) { ?>
+        startFaceDetection();
+    <?php } else { ?>
+        stopFaceDetection();
+    <?php } ?>
+};
 </script>
+
 </body>
 </html>
