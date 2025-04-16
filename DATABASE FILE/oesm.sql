@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.5.2
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2021 at 07:53 PM
--- Server version: 5.6.21
--- PHP Version: 5.6.3
+-- Generation Time: Apr 16, 2025 at 01:05 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -30,16 +31,17 @@ CREATE TABLE `admin` (
   `email` varchar(50) NOT NULL,
   `password` varchar(500) NOT NULL,
   `gender` varchar(50) NOT NULL,
-  `college` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `college` varchar(255) NOT NULL,
+  `photo` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`email`, `password`, `gender`, `college`) VALUES
-('sunnygkp10@gmail.com', '123456', '', ''),
-('d@d.com', 'asd', 'a', 'asd');
+INSERT INTO `admin` (`email`, `password`, `gender`, `college`, `photo`) VALUES
+('sunnygkp10@gmail.com', '123456', '', '', ''),
+('d@d.com', 'asd', 'a', 'asd', '');
 
 -- --------------------------------------------------------
 
@@ -50,7 +52,7 @@ INSERT INTO `admin` (`email`, `password`, `gender`, `college`) VALUES
 CREATE TABLE `answer` (
   `qid` text NOT NULL,
   `ansid` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `answer`
@@ -83,7 +85,7 @@ CREATE TABLE `feedback` (
   `feedback` varchar(500) NOT NULL,
   `date` date NOT NULL,
   `time` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `feedback`
@@ -107,8 +109,8 @@ CREATE TABLE `history` (
   `level` int(11) NOT NULL,
   `sahi` int(11) NOT NULL,
   `wrong` int(11) NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `history`
@@ -128,7 +130,11 @@ INSERT INTO `history` (`email`, `eid`, `score`, `level`, `sahi`, `wrong`, `date`
 ('james@gmail.com', '5589222f16b93', 4, 2, 2, 0, '2021-04-11 17:26:54'),
 ('steeve@gmail.com', '558921841f1ec', 4, 2, 2, 0, '2021-04-11 17:44:46'),
 ('steeve@gmail.com', '5589222f16b93', 4, 2, 2, 0, '2021-04-11 17:45:20'),
-('steeve@gmail.com', '6073360884420', 6, 3, 3, 0, '2021-04-11 17:50:15');
+('steeve@gmail.com', '6073360884420', 6, 3, 3, 0, '2021-04-11 17:50:15'),
+('kianr664@gmail.com', '558922ec03021', -2, 2, 0, 2, '2025-04-16 09:44:25'),
+('kianr664@gmail.com', '558922ec03021', -2, 2, 0, 2, '2025-04-16 09:44:25'),
+('kianr664@gmail.com', '6073360884420', 0, 3, 2, 2, '2025-04-16 10:50:06'),
+('kianr664@gmail.com', '6073360884420', 0, 3, 2, 2, '2025-04-16 10:50:06');
 
 -- --------------------------------------------------------
 
@@ -140,7 +146,7 @@ CREATE TABLE `options` (
   `qid` varchar(50) NOT NULL,
   `option` varchar(5000) NOT NULL,
   `optionid` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `options`
@@ -204,7 +210,7 @@ CREATE TABLE `questions` (
   `qns` text NOT NULL,
   `choice` int(10) NOT NULL,
   `sn` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `questions`
@@ -238,8 +244,8 @@ CREATE TABLE `quiz` (
   `time` bigint(20) NOT NULL,
   `intro` text NOT NULL,
   `tag` varchar(100) NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `quiz`
@@ -261,8 +267,8 @@ INSERT INTO `quiz` (`eid`, `title`, `sahi`, `wrong`, `total`, `time`, `intro`, `
 CREATE TABLE `rank` (
   `email` varchar(50) NOT NULL,
   `score` int(11) NOT NULL,
-  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `time` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `rank`
@@ -276,7 +282,8 @@ INSERT INTO `rank` (`email`, `score`, `time`) VALUES
 ('doe@gmail.com', 4, '2021-04-11 17:20:17'),
 ('clancy@gmail.com', 4, '2021-04-11 13:24:37'),
 ('james@gmail.com', 14, '2021-04-11 17:32:53'),
-('steeve@gmail.com', 14, '2021-04-11 17:50:15');
+('steeve@gmail.com', 14, '2021-04-11 17:50:15'),
+('kianr664@gmail.com', -4, '2025-04-16 10:50:06');
 
 -- --------------------------------------------------------
 
@@ -290,23 +297,58 @@ CREATE TABLE `user` (
   `college` varchar(100) NOT NULL,
   `email` varchar(50) NOT NULL,
   `mob` bigint(20) NOT NULL,
-  `password` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `password` varchar(50) NOT NULL,
+  `photo` varchar(255) DEFAULT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = Enabled, 0 = Disabled'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`name`, `gender`, `college`, `email`, `mob`, `password`) VALUES
-('Asley', 'F', 'Wh Coast College', 'ashley@gmail.com', 3014797869, 'e10adc3949ba59abbe56e057f20f883e'),
-('Tom Clancy', 'M', 'Wh Coast College', 'clancy@gmail.com', 1485554569, '5f4dcc3b5aa765d61d8327deb882cf99'),
-('John Doe', 'M', 'Demo College', 'doe@gmail.com', 1245788880, '5f4dcc3b5aa765d61d8327deb882cf99'),
-('Freda Mack\n', 'F', 'Wh Coast College', 'freda@gmail.com', 2150488880, 'e10adc3949ba59abbe56e057f20f883e'),
-('James Rhoades', 'M', 'Westham College', 'james@gmail.com', 245778540, '5f4dcc3b5aa765d61d8327deb882cf99'),
-('Johnny', 'M', 'Greenville College', 'johnnys@gmail.com', 3780145870, 'e10adc3949ba59abbe56e057f20f883e'),
-('Liam', 'M', 'Liberty College', 'liam@gmail.com', 1753150015, 'e10adc3949ba59abbe56e057f20f883e'),
-('Steeve Moore', 'M', 'Westview College', 'steeve@gmail.com', 2146975696, '5f4dcc3b5aa765d61d8327deb882cf99'),
-('William', 'M', 'Riverview College', 'will@gmail.com', 3478540365, 'e10adc3949ba59abbe56e057f20f883e');
+INSERT INTO `user` (`name`, `gender`, `college`, `email`, `mob`, `password`, `photo`, `status`) VALUES
+('Asley', 'F', 'Wh Coast College', 'ashley@gmail.com', 3014797869, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
+('Tom Clancy', 'M', 'Wh Coast College', 'clancy@gmail.com', 1485554569, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
+('John Doe', 'M', 'Demo College', 'doe@gmail.com', 1245788880, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
+('Freda Mack\n', 'F', 'Wh Coast College', 'freda@gmail.com', 2150488880, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
+('James Rhoades', 'M', 'Westham College', 'james@gmail.com', 245778540, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
+('Johnny', 'M', 'Greenville College', 'johnnys@gmail.com', 3780145870, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
+('Rhea M. Melchor.', 'M', 'fewfe', 'jruby13111@gmail.com', 7464, '$2y$10$xzQ/Oui0g4/Vw6lob.Qbm.6gbkcuro4vfm3blZki3TR', 'uploads/user_67fd8c77270f7.png', 1),
+('Rhea M. Melchor.', 'F', 'fewfe', 'jruby13111@gmail.wom', 7464, '$2y$10$koVfG9mkxHKL3pqqZqAhZeR2a9XQE6yDd6q82OtXC..', 'uploads/user_67fd8e96e2ba2.png', 1),
+('Rhea M. Melchor.', 'M', 'fewfe', 'jruby1311@gmail.com', 7464, '$2y$10$m19FU/EZ7VhLqOchEmkjAuD9Un9UrCow/9mzPCM5Bz7', 'uploads/user_67fceafbed4c5.png', 1),
+('Rhea M. Melchor.', 'M', 'fewfe', 'jruby131@gmail.com', 7464, '$2y$10$svc8n3Hj05vbvpxYzA.eFuZaqwNrlTy//c.2mT6MdoU', 'uploads/user_67fce8e5b4ade5.41049439.jpg', 1),
+('Rodriguez, Kian A.', 'M', '3-1', 'kianr664@gmail.com', 3423242, '1edd4a1fe5695e7d4bdfd47c13318201', NULL, 0),
+('Liam', 'M', 'Liberty College', 'liam@gmail.com', 1753150015, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
+('Steeve Moore', 'M', 'Westview College', 'steeve@gmail.com', 2146975696, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
+('William', 'M', 'Riverview College', 'will@gmail.com', 3478540365, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `warning`
+--
+
+CREATE TABLE `warning` (
+  `id` int(11) NOT NULL,
+  `timestamp` datetime NOT NULL,
+  `email` varchar(50) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `warning`
+--
+
+INSERT INTO `warning` (`id`, `timestamp`, `email`) VALUES
+(4, '2025-04-16 12:38:15', 'kianr664@gmail.com'),
+(5, '2025-04-16 12:38:33', 'kianr664@gmail.com'),
+(6, '2025-04-16 12:46:27', 'kianr664@gmail.com'),
+(7, '2025-04-16 12:47:56', 'kianr664@gmail.com'),
+(8, '2025-04-16 12:48:04', 'kianr664@gmail.com'),
+(9, '2025-04-16 12:49:30', 'kianr664@gmail.com'),
+(10, '2025-04-16 12:49:47', 'kianr664@gmail.com'),
+(11, '2025-04-16 12:49:50', 'kianr664@gmail.com'),
+(12, '2025-04-16 13:04:42', 'kianr664@gmail.com'),
+(13, '2025-04-16 13:04:46', 'kianr664@gmail.com');
 
 --
 -- Indexes for dumped tables
@@ -317,6 +359,23 @@ INSERT INTO `user` (`name`, `gender`, `college`, `email`, `mob`, `password`) VAL
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`email`);
+
+--
+-- Indexes for table `warning`
+--
+ALTER TABLE `warning`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `warning`
+--
+ALTER TABLE `warning`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
