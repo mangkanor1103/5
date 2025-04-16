@@ -175,3 +175,25 @@ if __name__ == '__main__':
         print(f"Error: {e}")
     finally:
         cv2.destroyAllWindows()
+
+        
+from flask import Flask, jsonify
+import os
+import sys
+import signal
+
+app = Flask(__name__)
+
+@app.route('/face_position')
+def face_position():
+    # Your existing logic to return face position
+    return jsonify({"position": "LEFT", "gaze": "RIGHT", "mouth": "CLOSED"})
+
+@app.route('/restart', methods=['POST'])
+def restart_server():
+    # Logic to restart the server
+    os.execv(sys.executable, ['python'] + sys.argv)  # Restart the server
+    return jsonify({"status": "restarting"}), 200
+
+if __name__ == '__main__':
+    app.run(debug=True)
