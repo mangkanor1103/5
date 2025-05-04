@@ -3,596 +3,712 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Online Exam System</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css"/>
-    <link rel="stylesheet" href="css/font.css"/>
-    <script src="js/jquery.js" type="text/javascript"></script>
-    <script src="js/bootstrap.min.js" type="text/javascript"></script>
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <title>RS Online Exam System</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
     <!-- Font Awesome -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- jQuery (needed for modals) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#28a745',     // Green color matching account.php
+                        'primary-dark': '#218838', // Darker green for hover states (also from account.php)
+                        'primary-light': '#9be3b0', // Light green for subtle highlights
+                        secondary: '#dc3545',   // Red secondary color
+                        'secondary-dark': '#bd2130', // Darker red for hover states
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'bounce-slow': 'bounce 3s infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    
     <style>
+        /* Updated color-related styles to match account.php */
         body {
-            background-color: #f8f9fa; /* Light background */
-            color: #333;
-            font-family: 'Roboto', sans-serif;
-            overflow: hidden; /* Prevent body scrolling */
-            height: 100vh; /* Full height */
-            display: flex;
-            flex-direction: column;
-            position: relative; /* Position relative for absolute children */
-        }
-        .header {
-            background-color: #28a745; /* Green background */
-            color: white;
-            padding: 10px 20px; /* Padding for header */
-            display: flex;
-            justify-content: space-between; /* Space between title and button */
-            align-items: center; /* Center items vertically */
-            position: fixed;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        .header h1 {
-            margin: 0; /* Remove default margin */
-            font-size: 24px; /* Font size for title */
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: calc(100vh - 60px); /* Adjust height to account for header */
-            overflow-y: auto; /* Allow scrolling for the container */
-            padding-top: 60px; /* Space for fixed header */
-        }
-        .panel {
-            background-image: url(image/bg.jpg);
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            padding: 30px;
-            margin: 20px;
-            width: 100%;
-            max-width: 800px; /* Increased width for two columns */
-            animation: fadeIn 0.5s ease-in-out; /* Animation for panel */
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .form-control {
-            border-radius: 5px;
-            border: 1px solid #28a745; /* Green border */
-            transition: border-color 0.3s, box-shadow 0.3s; /* Transition for input focus */
-        }
-        .form-control:focus {
-            border-color: #218838; /* Darker green on focus */
-            box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
-        }
-        .btn-danger {
-            background-color: #28a745; /* Green button */
-            border: none;
-            border-radius: 5px;
-            color: white;
-            transition: background-color 0.3s, transform 0.3s; /* Transition for button hover */
-        }
-        .btn-danger:hover {
-            background-color: #218838; /* Darker green on hover */
-            transform: translateY(-2px); /* Lift effect on hover */
-        }
-        .footer {
-            background-color: #28a745; /* Green footer */
-            color: white;
-            padding: 10px 0;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
             text-align: center;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
         }
-        .btn-custom {
-    background-color: white !important;
-    color: black !important;
-    border: 1px solid black;
-}
-.btn:hover {
-    background-color: #218838 !important; /* Darker green */
-    transform: scale(1.05); /* Slightly increase size */
-    transition: all 0.3s ease-in-out;
-}
-.btn-register {
-    background-color: #b30000 !important; /* Green */
-    border: none;
-    color: white !important;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.btn-register:hover {
-    background-color: #218838 !important; /* Darker Green */
-    transform: scale(1.05);
-}
-
-
-        .footer a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s; /* Transition for footer links */
-        }
-        .footer a:hover {
-            color: #00c6ff; /* Change color on hover */
-        }
-        .form-row {
-            margin-bottom: 15px; /* Space between form rows */
-        }
-
-        /* Moving Icons Background */
-        .moving-icons {
-            position: absolute;
+        
+        .animated-bg {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none; /* Prevent interaction with icons */
-            overflow: hidden; /* Hide overflow */
-            z-index: 0; /* Behind other content */
+            z-index: -1;
+            background: linear-gradient(120deg, #dff8e7 0%, #b6e6c4 100%);  /* Lighter gradient to match account.php */
+            overflow: hidden;
         }
-        .moving-icons i {
+        
+        .floating-icon {
             position: absolute;
-            font-size: 50px; /* Size of icons */
-            color: rgba(40, 167, 69, 0.5); /* Light green color */
-            animation: move 10s linear infinite; /* Animation for moving icons */
+            opacity: 0.5;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.15));
+            z-index: -1;
+            transition: all 0.3s ease;
+            color: #28a745; /* Updated color */
         }
-        @keyframes move {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-100vh); }
+        
+        .floating-icon:hover {
+            opacity: 0.7;
+            transform: scale(1.2);
+        }
+        
+        @keyframes blob {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            25% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+            50% { border-radius: 50% 60% 30% 40% / 40% 30% 70% 60%; }
+            75% { border-radius: 40% 30% 70% 60% / 60% 40% 30% 70%; }
+        }
+        
+        .blob {
+            position: absolute;
+            background: rgba(40, 167, 69, 0.18);  /* Updated to match account.php green */
+            width: 300px;
+            height: 300px;
+            animation: blob 15s linear infinite alternate;
+            z-index: -1;
+        }
+        
+        .form-input {
+            @apply w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+        
+        .form-input:hover {
+            @apply border-gray-400;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+        }
+        
+        .form-input:focus {
+            @apply border-primary;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);  /* Updated to match account.php green */
+            outline: none;
+        }
+        
+        .input-container {
+            position: relative;
+            margin-bottom: 0.75rem;
+        }
+        
+        .input-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #28a745;  /* Updated to match account.php green */
+            font-size: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;  /* Slightly bolder */
+            color: #2d3748;  /* Darker for better contrast */
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            @apply bg-primary hover:bg-primary-dark text-white font-medium py-2 px-6 rounded-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50;
+        }
+        
+        .btn-secondary {
+            @apply bg-secondary hover:bg-secondary-dark text-white font-medium py-2 px-6 rounded-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-opacity-50;
+        }
+        
+        .btn-outline {
+            @apply border border-gray-400 text-gray-700 font-medium py-2 px-6 rounded-lg transform transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50;
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 28rem;
+            transform: scale(0.95);
+            transition: transform 0.3s ease-in-out;
+            text-align: center;
+        }
+        
+        .modal-content > div:first-child {
+            background-color: #28a745;  /* Matching account.php green */
+        }
+        
+        .modal.active {
+            display: flex !important;
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .space-y-2 label {
+            text-align: left;
+            display: block;
+        }
+        
+        .modal-content .p-6 {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .modal-content form {
+            width: 100%;
+        }
+        
+        /* Register button styling to match account.php */
+        .btn-register {
+            background-color: #b30000 !important; /* Red color from account.php */
+            color: white !important;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        
+        .btn-register:hover {
+            background-color: #218838 !important; /* Green on hover from account.php */
+            transform: scale(1.05);
+        }
+        
+        /* Footer styling to match account.php */
+        .footer {
+            background-color: #28a745; /* Green footer */
+            color: white;
+        }
+        
+        .footer a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer a:hover {
+            color: #f8f9fa; /* Light color on hover */
         }
     </style>
 </head>
 
-<body>
-    <div class="moving-icons">
-        <i class="fas fa-graduation-cap" style="left: 10%; animation-delay: 0s;"></i>
-        <i class="fas fa-book" style="left: 30%; animation-delay: 2s;"></i>
-        <i class="fas fa-laptop" style="left: 50%; animation-delay: 4s;"></i>
-        <i class="fas fa-pencil-alt" style="left: 70%; animation-delay: 6s;"></i>
-        <i class="fas fa-users" style="left: 90%; animation-delay: 8s;"></i>
+<body class="min-h-screen flex flex-col">
+    <!-- Animated Background -->
+    <div class="animated-bg">
+        <div class="blob" style="top: 10%; left: 10%;"></div>
+        <div class="blob" style="top: 60%; left: 80%;"></div>
+        <div class="blob" style="top: 80%; left: 30%;"></div>
+        
+        <!-- Floating Icons -->
+        <i class="fas fa-graduation-cap floating-icon text-5xl animate-float" style="top: 15%; left: 10%;"></i>
+        <i class="fas fa-book floating-icon text-4xl animate-pulse-slow" style="top: 30%; left: 85%;"></i>
+        <i class="fas fa-laptop floating-icon text-5xl animate-bounce-slow" style="top: 70%; left: 15%;"></i>
+        <i class="fas fa-pencil-alt floating-icon text-4xl animate-float" style="top: 80%; left: 80%; animation-delay: 2s;"></i>
+        <i class="fas fa-users floating-icon text-5xl animate-pulse-slow" style="top: 40%; left: 50%; animation-delay: 1s;"></i>
     </div>
 
-    <div class="header">
-    <img src="image/rslogo.jpg" alt="RS Logo" style="height: 50px; margin-right: 10px; border-radius: 50%;">
-    <h1 style="display: flex; align-items: center; margin: 0;">
-        RS Online Exam
-    </h1>
-    <a href="#" class="btn btn-register" data-toggle="modal" data-target="#myModal">
-        <i class="fa fa-sign-in-alt"></i> Login
-    </a>
-</div>
-
-<div class="container">
-    <div class="panel">
-        <form class="form-horizontal" name="form" action="sign.php?q=account.php" 
-              onSubmit="return validateForm()" method="POST" enctype="multipart/form-data">
-            <fieldset>
-                <legend class="text-center" style="color: #28a745;"><b>Register Now</b></legend>
-
-                <div class="row">
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="name">Full Name</label>
-                        <span class="input-group-text"><i class="fa fa-user"></i></span>
-                        <input id="name" name="name" placeholder="Fullname" class="form-control" type="text" required>
-                    </div>
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="gender">Gender</label>
-                        <span class="input-group-text"><i class="fa fa-venus-mars"></i></span>
-                        <select id="gender" name="gender" class="form-control" required>
-                            <option value="">Select Gender</option>
-                            <option value="M">Male</option>
-                            <option value="F">Female</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="college">Year and Section</label>
-                        <span class="input-group-text"><i class="fa fa-school"></i></span>
-                        <input id="college" name="college" placeholder="Year and Section" class="form-control" type="text" required>
-                    </div>
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="email">Email ID</label>
-                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                        <input id="email" name="email" placeholder="Email ID" class="form-control" type="email" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="mob">Contact Number</label>
-                        <span class="input-group-text"><i class="fa fa-phone"></i></span>
-                        <input id="mob" name="mob" placeholder="Contact Number" class="form-control" type="number" required>
-                    </div>
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="password">Password</label>
-                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                        <input id="password" name="password" placeholder="Password" class="form-control" type="password" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 form-row">
-                        <label class="control-label" for="cpassword">Confirm Password</label>
-                        <span class="input-group-text"><i class="fa fa-check-circle"></i></span>
-                        <input id="cpassword" name="cpassword" placeholder="Confirmation Password" class="form-control" type="password" required>
-                    </div>
-                    <div class="col-md-6 form-row">
-    <label class="control-label">Profile Photo</label>
-    <div class="mb-2">
-        <video id="camera" autoplay playsinline width="100%" style="display:none;"></video>
-        <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="startCamera()">📷 Upload Photo</button>
-        <button type="button" class="btn btn-success btn-sm mt-2" onclick="capture()" style="display:none;" id="captureBtn">✅ Capture</button>
-    </div>
-    <canvas id="snapshot" style="display:none;"></canvas>
-    <input type="hidden" name="photo_data" id="photo_data" required>
-    <img id="preview" src="#" alt="Captured photo" style="display:none; max-width: 100%; margin-top: 10px; border: 1px solid #ccc;">
-</div>
-
-                </div>
-
-                <div class="form-group text-center">
-                    <input type="submit" class="btn btn-register" value="Register"/>
-                </div>
-            </fieldset>
-        </form>
-    </div>
-</div>
-
-
-    <div class="footer">
-        <div class="row">
-            <div class="col-md-4">
-                <a href="#" data-toggle="modal" data-target="#login" class="icon">
-                    <i class="fas fa-user-shield"></i> Admin Login
-                </a>
+    <!-- Header -->
+    <header class="fixed w-full bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-md z-50 transition-all duration-300">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="image/rslogo.jpg" alt="RS Logo" class="h-12 w-12 rounded-full shadow-md transition-transform duration-300 hover:scale-110">
+                <h1 class="text-xl md:text-2xl font-bold text-primary">RS Online Exam</h1>
             </div>
-            <div class="col-md-4">
-                <a href="#" data-toggle="modal" data-target="#developers" class="icon">
-                    <i class="fas fa-code"></i> Developers
-                </a>
-            </div>
-            <div class="col-md-4">
-                <a href="feedback.php" target="_blank" class="icon">
-                    <i class="fas fa-comments"></i> Feedback
-                </a>
-            </div>
+            <button id="loginBtn" class="btn-secondary flex items-center space-x-2">
+                <i class="fa fa-sign-in-alt"></i>
+                <span>Login</span>
+            </button>
         </div>
-    </div>
-<!-- Modal for Login -->
-<div class="modal fade" id="myModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #28a745; color: white;">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">User Login</h4>
-            </div>
-            <div class="modal-body">
-                <form class="form-horizontal" action="login.php?q=index.php" method="POST">
-                    <div class="form-group">
-                        <label class="control-label" for="email">Email</label>
-                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                        <div>
-                            <input id="email" name="email" placeholder="Email" class="form-control" type="email">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label" for="password">Password</label>
-                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                        <div>
-                            <input id="password" name="password" placeholder="Password" class="form-control" type="password">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-register" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-register">Log in</button>
-                    </div>
-                </form>
+    </header>
 
-                <!-- Face Login Button -->
-                <div class="text-center mb-2">
-                    <button class="btn btn-outline-success" onclick="openFaceLoginModal()">Login using Face</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal for Face Login (Real-time Camera Feed) -->
-<div class="modal fade" id="faceLoginModal" tabindex="-1" role="dialog" aria-labelledby="faceLoginModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header" style="background-color: #28a745; color: white;">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">Face Login</h4>
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <video id="faceCam" width="100%" autoplay style="display:block;"></video>
-                    <canvas id="faceCanvas" style="display:none;"></canvas>
-                    <div id="statusMessage"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    const videoElement = document.getElementById("faceCam");
-    const canvasElement = document.getElementById("faceCanvas");
-    const context = canvasElement.getContext('2d');
-
-    // Set up the camera feed
-    async function startCamera() {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        videoElement.srcObject = stream;
-    }
-
-    // Capture frame and send to the server for recognition
-    function captureAndMatchFace() {
-        canvasElement.width = videoElement.videoWidth;
-        canvasElement.height = videoElement.videoHeight;
-        context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-        // Send the image data to the server
-        canvasElement.toBlob((blob) => {
-            let formData = new FormData();
-            formData.append('image', blob);
-            
-            // Send to server via Fetch API
-            fetch('/face-recognition', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.match) {
-                    document.getElementById('statusMessage').innerText = "Face Matched!";
-                } else {
-                    document.getElementById('statusMessage').innerText = "No Match Found.";
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    }
-
-    // Start camera feed when modal is opened
-    $('#faceLoginModal').on('shown.bs.modal', function() {
-        startCamera();
-    });
-
-    // Capture and match the face every 2 seconds
-    setInterval(captureAndMatchFace, 2000);
-</script>
-
-
-
-    <!-- Modal for Developers -->
-    <div class="modal fade" id="developers">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #28a745; color: white;">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Developers</h4>
-                </div>
-                <div class="modal-body">
-                    <p>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <img src="image/CAM00121.jpg" width=100 height=100 alt="Developer" class="img-rounded">
+    <!-- Main Content -->
+    <main class="flex-grow pt-24 pb-16">
+        <div class="container mx-auto px-4 py-8">
+            <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden transform transition-all duration-500 hover:shadow-2xl">
+                <div class="p-8 md:p-12 bg-gradient-to-br from-white to-green-50">
+                    <h2 class="text-2xl md:text-3xl font-bold text-center text-primary mb-8">Register Now</h2>
+                    
+                    <form class="space-y-6" name="form" action="sign.php?q=account.php" onSubmit="return validateForm()" method="POST" enctype="multipart/form-data">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Full Name -->
+                            <div class="space-y-2">
+                                <label for="name" class="form-label">Full Name</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-user input-icon"></i>
+                                    </div>
+                                    <input id="name" name="name" placeholder="Enter your full name" class="form-input pl-10" type="text" required>
+                                </div>
                             </div>
-                            <div class="col-md-8">
-                                <a style="color: #28a745; font-size: 18px; text-decoration: none;">Kian A. Rodrigez</a>
-                                <h4 style="color: #28a745;">+9366717240</h4>
-                                <h4 style="color: #28a745;">kianr664@gmail.com</h4>
+                            
+                            <!-- Gender -->
+                            <div class="space-y-2">
+                                <label for="gender" class="form-label">Gender</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-venus-mars input-icon"></i>
+                                    </div>
+                                    <select id="gender" name="gender" class="form-input pl-10" required>
+                                        <option value="">Select Gender</option>
+                                        <option value="M">Male</option>
+                                        <option value="F">Female</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Year and Section -->
+                            <div class="space-y-2">
+                                <label for="college" class="form-label">Year and Section</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-school input-icon"></i>
+                                    </div>
+                                    <input id="college" name="college" placeholder="Enter year and section" class="form-input pl-10" type="text" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Email -->
+                            <div class="space-y-2">
+                                <label for="email" class="form-label">Email ID</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-envelope input-icon"></i>
+                                    </div>
+                                    <input id="email" name="email" placeholder="Enter your email" class="form-input pl-10" type="email" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Contact Number -->
+                            <div class="space-y-2">
+                                <label for="mob" class="form-label">Contact Number</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-phone input-icon"></i>
+                                    </div>
+                                    <input id="mob" name="mob" placeholder="Enter contact number" class="form-input pl-10" type="number" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Password -->
+                            <div class="space-y-2">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-lock input-icon"></i>
+                                    </div>
+                                    <input id="password" name="password" placeholder="Create a password" class="form-input pl-10" type="password" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Confirm Password -->
+                            <div class="space-y-2">
+                                <label for="cpassword" class="form-label">Confirm Password</label>
+                                <div class="relative rounded-md shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="fa fa-check-circle input-icon"></i>
+                                    </div>
+                                    <input id="cpassword" name="cpassword" placeholder="Confirm your password" class="form-input pl-10" type="password" required>
+                                </div>
+                            </div>
+                            
+                            <!-- Profile Photo -->
+                            <div class="space-y-2 mx-auto md:col-span-2">
+                                <label class="form-label text-center block">Profile Photo</label>
+                                <div class="space-y-3 flex flex-col items-center">
+                                    <video id="camera" autoplay playsinline class="w-full max-w-xs rounded-lg border-2 border-gray-300 hidden"></video>
+                                    <button type="button" class="btn-outline flex items-center space-x-2" onclick="startCamera()">
+                                        <i class="fas fa-camera"></i>
+                                        <span>Upload Photo</span>
+                                    </button>
+                                    <button type="button" id="captureBtn" class="hidden btn-primary flex items-center space-x-2" onclick="capture()">
+                                        <i class="fas fa-check"></i>
+                                        <span>Capture</span>
+                                    </button>
+                                    <canvas id="snapshot" class="hidden"></canvas>
+                                    <input type="hidden" name="photo_data" id="photo_data">
+                                    <img id="preview" src="#" alt="Captured photo" class="hidden max-w-xs w-full h-auto rounded-lg border-2 border-primary mt-2">
+                                </div>
                             </div>
                         </div>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal for Admin Login -->
-    <div class="modal fade" id="login">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header" style="background-color: #28a745; color: white;">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Admin Login</h4>
-                </div>
-                <div class="modal-body">
-                    <form role="form" method="post" action="admin.php?q=index.php">
-                        <div class="form-group">
-                        <label class="control-label" for="email">Username</label>
-                        <span class="input-group-text"><i class="fa fa-envelope"></i></span>
-                            <input type="text" name="uname" maxlength="20" placeholder="Admin Email" class="form-control" required/>
-                        </div>
-                        <div class="form-group">
-                        <label class="control-label" for="email">Password</label>
-                        <span class="input-group-text"><i class="fa fa-lock"></i></span>
-                            <input type="password" name="password" maxlength="15" placeholder="Password" class="form-control" required/>
-                        </div>
-                        <div class="form-group text-center">
-                            <input type="submit" name="login" value="Login" class="btn btn-register" />
+                        
+                        <!-- Submit Button -->
+                        <div class="text-center pt-6">
+                            <button type="submit" class="btn-primary px-8 py-3 text-lg">
+                                <span class="flex items-center justify-center space-x-2">
+                                    <i class="fas fa-user-plus"></i>
+                                    <span>Register</span>
+                                </span>
+                            </button>
                         </div>
                     </form>
                 </div>
             </div>
         </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer py-6 mt-auto">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="group">
+                    <a href="#" id="adminLoginBtn" class="inline-flex justify-center items-center space-x-2 hover:text-green-200 transition-colors duration-300">
+                        <i class="fas fa-user-shield text-xl"></i>
+                        <span>Admin Login</span>
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="#" id="developersBtn" class="inline-flex justify-center items-center space-x-2 hover:text-green-200 transition-colors duration-300">
+                        <i class="fas fa-code text-xl"></i>
+                        <span>Developers</span>
+                    </a>
+                </div>
+                <div class="group">
+                    <a href="feedback.php" target="_blank" class="inline-flex justify-center items-center space-x-2 hover:text-green-200 transition-colors duration-300">
+                        <i class="fas fa-comments text-xl"></i>
+                        <span>Feedback</span>
+                    </a>
+                </div>
+            </div>
+            <div class="text-center mt-6 text-sm text-green-100">
+                &copy; 2025 RS Online Exam System | All Rights Reserved
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content w-full max-w-md">
+            <div class="bg-primary text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-xl font-bold">User Login</h3>
+                <button class="closeModal text-white text-2xl hover:text-green-200 transition-colors">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <form class="space-y-4" action="login.php?q=index.php" method="POST">
+                    <div class="space-y-2">
+                        <label for="login-email" class="form-label">Email</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa fa-envelope input-icon"></i>
+                            </div>
+                            <input id="login-email" name="email" placeholder="Enter your email" class="form-input pl-10" type="email" required>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label for="login-password" class="form-label">Password</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa fa-lock input-icon"></i>
+                            </div>
+                            <input id="login-password" name="password" placeholder="Enter your password" class="form-input pl-10" type="password" required>
+                        </div>
+                    </div>
+                    <div class="flex justify-between pt-2">
+                        <button type="button" class="closeModal btn-outline">Close</button>
+                        <button type="submit" class="btn-primary">Login</button>
+                    </div>
+                </form>
+                
+                <!-- Face Login Button -->
+                <div class="text-center pt-4 border-t border-gray-200 w-full">
+                    <p class="text-sm text-gray-600 mb-3">Or login using face recognition</p>
+                    <button class="btn-outline flex items-center space-x-2 mx-auto" onclick="openFaceLoginModal()">
+                        <i class="fas fa-camera"></i>
+                        <span>Login with Face</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Face Login Modal -->
+    <div id="faceLoginModal" class="modal">
+        <div class="modal-content w-full max-w-md">
+            <div class="bg-primary text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-xl font-bold">Face Login</h3>
+                <button class="closeModal text-white text-2xl hover:text-green-200 transition-colors">&times;</button>
+            </div>
+            <div class="p-6">
+                <div class="text-center space-y-4 w-full">
+                    <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-300">
+                        <div class="flex flex-col items-center justify-center">
+                            <i class="fas fa-tools text-5xl text-yellow-500 mb-3"></i>
+                            <h3 class="text-xl font-bold text-yellow-700 mb-2">Under Development</h3>
+                            <p class="text-yellow-600">This feature is currently being developed and will be available soon.</p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button type="button" class="closeModal btn-outline">
+                            <span>Close</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Hidden elements that will be used when feature is complete -->
+                <video id="faceCam" autoplay playsinline class="w-full rounded-lg border border-gray-300 mx-auto hidden"></video>
+                <canvas id="faceCanvas" class="hidden"></canvas>
+                <div id="statusMessage" class="hidden text-sm font-medium text-gray-700">
+                    Position your face in the camera
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content w-full max-w-md">
+            <div class="bg-primary text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-xl font-bold">Admin Login</h3>
+                <button class="closeModal text-white text-2xl hover:text-green-200 transition-colors">&times;</button>
+            </div>
+            <div class="p-6 space-y-4">
+                <form class="space-y-4" method="post" action="admin.php?q=index.php">
+                    <div class="space-y-2">
+                        <label class="form-label">Username</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa fa-user input-icon"></i>
+                            </div>
+                            <input type="text" name="uname" maxlength="20" placeholder="Admin Username" class="form-input pl-10" required/>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="form-label">Password</label>
+                        <div class="relative rounded-md shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa fa-lock input-icon"></i>
+                            </div>
+                            <input type="password" name="password" maxlength="15" placeholder="Password" class="form-input pl-10" required/>
+                        </div>
+                    </div>
+                    <div class="flex justify-between pt-2">
+                        <button type="button" class="closeModal btn-outline">Close</button>
+                        <button type="submit" name="login" class="btn-primary">Login</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developers Modal -->
+    <div id="developersModal" class="modal">
+        <div class="modal-content w-full max-w-md">
+            <div class="bg-primary text-white px-6 py-4 rounded-t-xl flex justify-between items-center">
+                <h3 class="text-xl font-bold">Developers</h3>
+                <button class="closeModal text-white text-2xl hover:text-green-200 transition-colors">&times;</button>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row items-center md:space-x-4 space-y-4 md:space-y-0">
+                    <div class="flex-shrink-0">
+                        <img src="image/CAM00121.jpg" class="h-24 w-24 object-cover rounded-full shadow-lg border-2 border-primary transition-transform duration-300 hover:scale-105" alt="Developer">
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h4 class="text-xl font-bold text-primary mb-1">Kian A. Rodrigez</h4>
+                        <p class="flex items-center justify-center md:justify-start text-gray-600 mb-1">
+                            <i class="fas fa-phone-alt mr-2 input-icon"></i>
+                            +9366717240
+                        </p>
+                        <p class="flex items-center justify-center md:justify-start text-gray-600">
+                            <i class="fas fa-envelope mr-2 input-icon"></i>
+                            kianr664@gmail.com
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-    let video = null;
-    let canvas = null;
-    let photo_data_input = null;
+        function startCamera() {
+            const video = document.getElementById('camera');
+            const captureBtn = document.getElementById('captureBtn');
 
-    function startCamera() {
-        video = document.getElementById('camera');
-        canvas = document.getElementById('snapshot');
-        photo_data_input = document.getElementById('photo_data');
-        const captureBtn = document.getElementById('captureBtn');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.classList.remove('hidden');
+                    captureBtn.classList.remove('hidden');
+                })
+                .catch(err => {
+                    alert("Camera access denied: " + err);
+                });
+        }
 
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-                video.style.display = 'block';
-                captureBtn.style.display = 'inline-block';
-            })
-            .catch(err => {
-                alert("Camera access denied: " + err);
+        function capture() {
+            const video = document.getElementById('camera');
+            const canvas = document.getElementById('snapshot');
+            const preview = document.getElementById('preview');
+            const photo_data_input = document.getElementById('photo_data');
+            const captureBtn = document.getElementById('captureBtn');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const dataURL = canvas.toDataURL('image/png');
+            preview.src = dataURL;
+            preview.classList.remove('hidden');
+            photo_data_input.value = dataURL;
+            
+            video.classList.add('hidden');
+            captureBtn.classList.add('hidden');
+            
+            video.srcObject.getTracks().forEach(track => track.stop());
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalElements = document.querySelectorAll('.modal');
+            const modals = {};
+            
+            modalElements.forEach(modal => {
+                const id = modal.id;
+                modals[id.replace('Modal', '')] = modal;
             });
-    }
-
-    function capture() {
-        const context = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const dataURL = canvas.toDataURL('image/png');
-        document.getElementById('preview').src = dataURL;
-        document.getElementById('preview').style.display = 'block';
-        photo_data_input.value = dataURL;
-        video.style.display = 'none';
-        document.getElementById('captureBtn').style.display = 'none';
-    }
-    // Open the Face Login Modal and start the webcam feed
-function openFaceLoginModal() {
-    // Show the modal
-    $('#faceLoginModal').modal('show');
-
-    // Start the video feed
-    startFaceLogin();
-}
-
-// Start webcam and video feed
-function startFaceLogin() {
-    const videoElement = document.getElementById("faceCam");
-    const canvasElement = document.getElementById("faceCanvas");
-    const statusMessage = document.getElementById("statusMessage");
-
-    // Set up webcam stream
-    navigator.mediaDevices.getUserMedia({
-        video: true
-    }).then(stream => {
-        videoElement.srcObject = stream;
-        videoElement.style.display = 'block'; // Show the video element
-        statusMessage.innerText = "Please position your face in front of the camera for recognition.";
-
-        // Start detecting faces once the video is ready
-        videoElement.onplay = function () {
-            detectFace();
-        };
-    }).catch(err => {
-        console.log("Error accessing webcam:", err);
-        statusMessage.innerText = "Unable to access the camera.";
-    });
-}
-
-// Perform face recognition and compare with saved faces
-function detectFace() {
-    const videoElement = document.getElementById("faceCam");
-    const canvasElement = document.getElementById("faceCanvas");
-    const context = canvasElement.getContext('2d');
-    
-    // Set canvas size to match the video
-    canvasElement.width = videoElement.videoWidth;
-    canvasElement.height = videoElement.videoHeight;
-
-    // Draw the current frame from the video to the canvas
-    context.drawImage(videoElement, 0, 0, canvasElement.width, canvasElement.height);
-
-    // Here you would integrate your face recognition logic.
-    // Example: Detect face and compare it with saved photos in the "uploads" folder.
-
-    // After recognition, show status messages or move to the next steps.
-    // For demo purposes, assume a match occurs:
-    setTimeout(() => {
-        statusMessage.innerText = "Face recognized successfully!";
-        // You can add a redirect or proceed with login actions here
-    }, 2000);
-}
-
-// Close modal and stop webcam
-function closeFaceLoginModal() {
-    $('#faceLoginModal').modal('hide');
-    const videoElement = document.getElementById("faceCam");
-    const stream = videoElement.srcObject;
-    const tracks = stream.getTracks();
-
-    tracks.forEach(track => track.stop()); // Stop the video stream
-    videoElement.srcObject = null;
-}
-
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    let video = document.getElementById('faceCam');
-    let canvas = document.getElementById('faceCanvas');
-    let context = canvas.getContext('2d');
-
-    // Function to start face login process
-    function startFaceLogin() {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then((stream) => {
-                // Show video and start the camera stream
-                video.style.display = 'block';
-                video.srcObject = stream;
-
-                // Wait for the camera to warm up (you can adjust this timing)
-                setTimeout(() => {
-                    // Capture an image from the video stream
-                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    let faceData = canvas.toDataURL('image/jpeg'); // Capture the image as base64
-
-                    // Send the captured image to the server
-                    fetch('face_login.py', {
-                        method: 'POST',
-                        body: JSON.stringify({ image: faceData }),
-                        headers: { 'Content-Type': 'application/json' }
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            alert('Face login successful!');
-                            window.location.href = 'index.php'; // Redirect after successful login
-                        } else {
-                            alert('Face not recognized.');
-                        }
-                    })
-                    .catch((err) => {
-                        console.error('Error during face recognition:', err);
-                        alert('An error occurred during face recognition.');
+            
+            function openModal(modalName) {
+                const modalId = modalName + 'Modal';
+                const modal = document.getElementById(modalId);
+                
+                if (modal) {
+                    modalElements.forEach(m => {
+                        m.classList.remove('active');
                     });
-                }, 3000); // Wait 3 seconds before capturing the photo
-            })
-            .catch((err) => {
-                console.error('Camera error:', err);
-                alert("Unable to access camera.");
+                    
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            document.getElementById('loginBtn').addEventListener('click', () => openModal('login'));
+            
+            const adminLoginBtn = document.getElementById('adminLoginBtn');
+            if (adminLoginBtn) {
+                adminLoginBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal('adminLogin');
+                });
+            }
+            
+            const developersBtn = document.getElementById('developersBtn');
+            if (developersBtn) {
+                developersBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openModal('developers');
+                });
+            }
+            
+            document.querySelectorAll('.closeModal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const modal = btn.closest('.modal');
+                    if (modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                        
+                        if (modal.id === 'faceLoginModal' && document.getElementById('faceCam').srcObject) {
+                            document.getElementById('faceCam').srcObject.getTracks().forEach(track => track.stop());
+                        }
+                    }
+                });
             });
-    }
-
-    // Attach the startFaceLogin function to your button
-    document.getElementById('startFaceLoginBtn').addEventListener('click', startFaceLogin);
-});
-</script>
-
-
+            
+            modalElements.forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                        document.body.style.overflow = '';
+                        
+                        if (modal.id === 'faceLoginModal' && document.getElementById('faceCam').srcObject) {
+                            document.getElementById('faceCam').srcObject.getTracks().forEach(track => track.stop());
+                        }
+                    }
+                });
+            });
+            
+            window.openFaceLoginModal = function() {
+                openModal('faceLogin');
+                startFaceLogin();
+            }
+            
+            function startFaceLogin() {
+                const videoElement = document.getElementById("faceCam");
+                const statusMessage = document.getElementById("statusMessage");
+                
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(stream => {
+                            videoElement.srcObject = stream;
+                            statusMessage.textContent = "Please position your face in front of the camera...";
+                            
+                            setTimeout(() => {
+                                statusMessage.textContent = "Scanning...";
+                                setTimeout(() => {
+                                    statusMessage.textContent = "Face recognized! Logging you in...";
+                                    setTimeout(() => {
+                                        statusMessage.textContent = "Authentication complete!";
+                                    }, 1000);
+                                }, 2000);
+                            }, 1500);
+                        })
+                        .catch(err => {
+                            console.error("Camera error:", err);
+                            statusMessage.textContent = "Unable to access camera.";
+                        });
+                } else {
+                    statusMessage.textContent = "Camera not supported in this browser.";
+                }
+            }
+        });
+        
+        function validateForm() {
+            const password = document.getElementById('password').value;
+            const cpassword = document.getElementById('cpassword').value;
+            
+            if (password !== cpassword) {
+                alert("Passwords do not match!");
+                return false;
+            }
+            
+            return true;
+        }
+    </script>
 </body>
 </html>
-
-

@@ -163,6 +163,8 @@ $w=$row['wrong'];
 }
 $w++;
 $s=$s-$wrong;
+// Ensure score doesn't go below zero
+if($s < 0) $s = 0;
 $q=mysqli_query($con,"UPDATE `history` SET `score`=$s,`level`=$sn,`wrong`=$w, date=NOW() WHERE  email = '$email' AND eid = '$eid'")or die('Error147');
 }
 if($sn != $total)
