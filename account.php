@@ -210,7 +210,10 @@ if (!isset($_SESSION['exam_active'])) {
     <div class="row">
         <div class="col-md-12">
             <?php if (@$_GET['q'] == 1) { ?>
-                <h3 class="text-center" style="margin-top: -220px;">Available Tests</h3> <!-- Moves title higher -->
+                <div style="text-align: center; margin-top: -220px;">
+                    <h2 style="color: #28a745; margin-bottom: 20px;">Welcome, <?php echo htmlspecialchars($name); ?>!</h2>
+                    <h3>Available Tests</h3>
+                </div>
                 <?php
                 $result = mysqli_query($con, "SELECT * FROM quiz ORDER BY date DESC") or die('Error');
                 echo '<div class="panel"><table class="table table-striped title1">
