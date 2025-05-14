@@ -166,6 +166,24 @@ def get_warning_image():
     return jsonify({"error": "No warning image available"}), 404
 
 
+@app.route('/restart', methods=['POST'])
+def restart_session():
+    """Reset all tracking variables to their initial state."""
+    global prev_x, movement_direction, gaze_direction, mouth_status
+    
+    # Reset all tracking variables
+    prev_x = None
+    movement_direction = "CENTER"
+    gaze_direction = "CENTER" 
+    mouth_status = "CLOSED"
+    
+    # Clear any saved warning image
+    if os.path.exists(warning_image_path):
+        os.remove(warning_image_path)
+        
+    return jsonify({"status": "success", "message": "Session restarted successfully"})
+
+
 if __name__ == '__main__':
     try:
         app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)

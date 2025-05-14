@@ -130,7 +130,21 @@ if ($con->query($sql) === TRUE) {
             // Add event listener to the "Go Back" button
             const goBackButton = document.getElementById("goBackButton");
             goBackButton.addEventListener("click", () => {
-                window.history.back();
+                // First restart the Python session
+                fetch('http://127.0.0.1:5000/restart', {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Python session restarted:", data);
+                    // Then go back to previous page
+                    window.history.back();
+                })
+                .catch(error => {
+                    console.error("Failed to restart Python session:", error);
+                    // Still go back even if restart fails
+                    window.history.back();
+                });
             });
         });
     </script>
