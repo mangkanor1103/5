@@ -421,6 +421,7 @@ session_start();
                                     <th class="px-4 py-3 text-left">Rank</th>
                                     <th class="px-4 py-3 text-left">Name</th>
                                     <th class="px-4 py-3 text-center">Score</th>
+                                    <th class="px-4 py-3 text-center">Remarks</th>
                                 </tr>
                             </thead>
                             <tbody>';
@@ -439,6 +440,20 @@ session_start();
                                         $name = $row['name'];
                                     }
                                 }
+                                
+                                // Determine remarks based on score
+                                if ($s >= 12) {
+                                    $remarks = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">Excellent</span>';
+                                } elseif ($s >= 9) {
+                                    $remarks = '<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Very Good</span>';
+                                } elseif ($s >= 6) {
+                                    $remarks = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">Good</span>';
+                                } elseif ($s >= 3) {
+                                    $remarks = '<span class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full">Satisfactory</span>';
+                                } else {
+                                    $remarks = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full">Needs Improvement</span>';
+                                }
+                                
                                 $c++;
                                 echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
                                     <td class="px-4 py-4">';
@@ -449,6 +464,7 @@ session_start();
                                     echo '</td>
                                     <td class="px-4 py-4 font-medium">'.$name.'</td>
                                     <td class="px-4 py-4 text-center text-primary font-bold">'.$s.'</td>
+                                    <td class="px-4 py-4 text-center">'.$remarks.'</td>
                                 </tr>';
                             }
                             echo '</tbody></table></div>';
@@ -788,6 +804,7 @@ session_start();
                                         <th class="px-4 py-3 text-left">Email</th>
                                         <th class="px-4 py-3 text-center">Warnings</th>
                                         <th class="px-4 py-3 text-center">Status</th>
+                                        <th class="px-4 py-3 text-center">Remarks</th>
                                         <th class="px-4 py-3 text-center">Action</th>
                                     </tr>
                                 </thead>
@@ -795,6 +812,22 @@ session_start();
                             
                             while ($row = $result->fetch_assoc()) {
                                 $statusClass = $row['status'] == 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                                $warningCount = (int)$row['warning_count'];
+                                
+                                // Determine remarks based on warning count
+                                if ($warningCount >= 40) {
+                                    $remarks = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full">Critical Violation</span>';
+                                } elseif ($warningCount >= 30) {
+                                    $remarks = '<span class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full">Severe Violation</span>';
+                                } elseif ($warningCount >= 20) {
+                                    $remarks = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">Major Violation</span>';
+                                } elseif ($warningCount >= 10) {
+                                    $remarks = '<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Moderate Violation</span>';
+                                } elseif ($warningCount > 0) {
+                                    $remarks = '<span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full">Minor Violation</span>';
+                                } else {
+                                    $remarks = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">No Violations</span>';
+                                }
                                 
                                 echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
                                     <td class="px-4 py-4 font-medium">' . htmlspecialchars($row['email']) . '</td>
@@ -804,6 +837,7 @@ session_start();
                                             ' . ($row['status'] == 1 ? 'Enabled' : 'Disabled') . '
                                         </span>
                                     </td>
+                                    <td class="px-4 py-4 text-center">' . $remarks . '</td>
                                     <td class="px-4 py-4 text-center">';
                                 
                                 if ($row['status'] == 1) {
