@@ -278,6 +278,9 @@ session_start();
                 <a class="nav-item <?php if(@$_GET['q']==5) echo 'active'; ?>" href="dash.php?q=5">
                     <i class="fas fa-exclamation-triangle mr-2"></i> Warnings
                 </a>
+                <a class="nav-item <?php if(@$_GET['q']==6) echo 'active'; ?>" href="dash.php?q=6">
+                    <i class="fas fa-redo-alt mr-2"></i> Restart Settings
+                </a>
             </div>
         </div>
     </nav>
@@ -297,6 +300,7 @@ session_start();
                         else if(@$_GET['q']==3) echo "Feedback";
                         else if(@$_GET['q']==4) echo "Add Exam";
                         else if(@$_GET['q']==5) echo "Warnings";
+                        else if(@$_GET['q']==6) echo "Restart Settings";
                         else echo "Dashboard";
                     ?>
                 </span>
@@ -863,6 +867,148 @@ session_start();
                             echo '<div class="text-center p-8 bg-gray-50 rounded-lg">
                                 <i class="fas fa-exclamation-circle text-4xl text-gray-400 mb-3"></i>
                                 <p class="text-gray-500">No warnings found in the database.</p>
+                            </div>';
+                        }
+                        ?>
+                    <?php } ?>
+
+                    <?php if(@$_GET['q']==6) { ?>
+                        <h2 class="panel-title">Exam Restart Permissions</h2>
+                        <p class="text-gray-600 mb-6">Manage which users are allowed to restart exams they have already taken.</p>
+                        
+                        <?php
+                        // Process permission updates if submitted
+                        if(isset($_POST['update_permissions'])) {
+                            $user_email = mysqli_real_escape_string($con, $_POST['user_email']);
+                            $exam_id = mysqli_real_escape_string($con, $_POST['exam_id']);
+                            $allow_restart = isset($_POST['allow_restart']) ? 1 : 0;
+                            
+                            // Check if a record already exists
+                            $check_query = mysqli_query($con, "SELECT * FROM user_exam_settings WHERE email='$user_email' AND eid='$exam_id'");
+                            
+                            if(mysqli_num_rows($check_query) > 0) {
+                                // Update existing record
+                                mysqli_query($con, "UPDATE user_exam_settings SET allow_restart='$allow_restart' WHERE email='$user_email' AND eid='$exam_id'") 
+                                    or die("Error updating permission: " . mysqli_error($con));
+                            } else {
+                                // Insert new record
+                                mysqli_query($con, "INSERT INTO user_exam_settings (email, eid, allow_restart) VALUES ('$user_email', '$exam_id', '$allow_restart')")
+                                    or die("Error inserting permission: " . mysqli_error($con));
+                            }
+                            
+                            echo '<div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
+                                <p>Restart permission updated successfully!</p>
+                            </div>';
+                        }
+                        
+                        // Form for setting new permissions
+                        ?>
+                        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                            <h3 class="text-xl font-semibold mb-6 text-primary">Set Restart Permission</h3>
+                            
+                            <form method="post" action="dash.php?q=6" class="space-y-6">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <label class="form-label">Select User</label>
+                                        <select name="user_email" class="form-input" required>
+                                            <option value="">-- Select User --</option>
+                                            <?php
+                                            $users_result = mysqli_query($con, "SELECT email, name FROM user ORDER BY name ASC");
+                                            while($user = mysqli_fetch_array($users_result)) {
+                                                echo '<option value="'.$user['email'].'">'.$user['name'].' ('.$user['email'].')</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label class="form-label">Select Exam</label>
+                                        <select name="exam_id" class="form-input" required>
+                                            <option value="">-- Select Exam --</option>
+                                            <?php
+                                            $exams_result = mysqli_query($con, "SELECT eid, title FROM quiz ORDER BY title ASC");
+                                            while($exam = mysqli_fetch_array($exams_result)) {
+                                                echo '<option value="'.$exam['eid'].'">'.$exam['title'].'</option>';
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="flex items-end">
+                                        <label class="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" name="allow_restart" value="1" class="h-5 w-5 text-primary rounded border-gray-300">
+                                            <span class="ml-2 text-gray-700">Allow Restart</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex justify-end">
+                                    <button type="submit" name="update_permissions" class="btn-primary inline-flex items-center justify-center space-x-2">
+                                        <i class="fas fa-save"></i>
+                                        <span>Save Permission</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <?php
+                        // Display existing permissions
+                        $permissions_query = mysqli_query($con, "
+                            SELECT s.email, s.eid, s.allow_restart, u.name as username, q.title as exam_title 
+                            FROM user_exam_settings s
+                            JOIN user u ON s.email = u.email
+                            JOIN quiz q ON s.eid = q.eid
+                            ORDER BY u.name ASC, q.title ASC
+                        ");
+                        
+                        if(mysqli_num_rows($permissions_query) > 0) {
+                            echo '<div class="bg-white rounded-xl shadow-md p-6">
+                                <h3 class="text-xl font-semibold mb-6 text-primary">Current Restart Permissions</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full bg-white border-collapse">
+                                        <thead>
+                                            <tr class="bg-gray-50 border-b-2 border-gray-200">
+                                                <th class="px-4 py-3 text-left">User</th>
+                                                <th class="px-4 py-3 text-left">Email</th>
+                                                <th class="px-4 py-3 text-left">Exam</th>
+                                                <th class="px-4 py-3 text-center">Restart Status</th>
+                                                <th class="px-4 py-3 text-center">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>';
+                            
+                            while($row = mysqli_fetch_array($permissions_query)) {
+                                $status_class = $row['allow_restart'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                                $status_text = $row['allow_restart'] ? 'Allowed' : 'Not Allowed';
+                                
+                                echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
+                                    <td class="px-4 py-4 font-medium">'.htmlspecialchars($row['username']).'</td>
+                                    <td class="px-4 py-4">'.htmlspecialchars($row['email']).'</td>
+                                    <td class="px-4 py-4">'.htmlspecialchars($row['exam_title']).'</td>
+                                    <td class="px-4 py-4 text-center">
+                                        <span class="px-2 py-1 rounded-full text-xs font-semibold '.$status_class.'">
+                                            '.$status_text.'
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-4 text-center">
+                                        <form method="post" action="dash.php?q=6" class="inline">
+                                            <input type="hidden" name="user_email" value="'.$row['email'].'">
+                                            <input type="hidden" name="exam_id" value="'.$row['eid'].'">
+                                            <input type="hidden" name="allow_restart" value="'.($row['allow_restart'] ? '0' : '1').'">
+                                            <button type="submit" name="update_permissions" class="btn-'.($row['allow_restart'] ? 'secondary' : 'primary').' inline-flex items-center justify-center space-x-1 py-1 px-3">
+                                                <i class="fas fa-'.($row['allow_restart'] ? 'ban' : 'check').'"></i>
+                                                <span>'.($row['allow_restart'] ? 'Revoke' : 'Allow').'</span>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>';
+                            }
+                            
+                            echo '</tbody></table></div></div>';
+                        } else {
+                            echo '<div class="text-center p-8 bg-gray-50 rounded-lg">
+                                <i class="fas fa-info-circle text-4xl text-gray-400 mb-3"></i>
+                                <p class="text-gray-500">No restart permissions have been set yet.</p>
                             </div>';
                         }
                         ?>

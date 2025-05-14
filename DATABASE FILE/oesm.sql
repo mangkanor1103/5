@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 16, 2025 at 01:05 PM
+-- Generation Time: May 14, 2025 at 07:41 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,17 +31,16 @@ CREATE TABLE `admin` (
   `email` varchar(50) NOT NULL,
   `password` varchar(500) NOT NULL,
   `gender` varchar(50) NOT NULL,
-  `college` varchar(255) NOT NULL,
-  `photo` varchar(255) NOT NULL
+  `college` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`email`, `password`, `gender`, `college`, `photo`) VALUES
-('sunnygkp10@gmail.com', '123456', '', '', ''),
-('d@d.com', 'asd', 'a', 'asd', '');
+INSERT INTO `admin` (`email`, `password`, `gender`, `college`) VALUES
+('sunnygkp10@gmail.com', '123456', '', ''),
+('d@d.com', 'asd', 'a', 'asd');
 
 -- --------------------------------------------------------
 
@@ -131,10 +130,8 @@ INSERT INTO `history` (`email`, `eid`, `score`, `level`, `sahi`, `wrong`, `date`
 ('steeve@gmail.com', '558921841f1ec', 4, 2, 2, 0, '2021-04-11 17:44:46'),
 ('steeve@gmail.com', '5589222f16b93', 4, 2, 2, 0, '2021-04-11 17:45:20'),
 ('steeve@gmail.com', '6073360884420', 6, 3, 3, 0, '2021-04-11 17:50:15'),
-('kianr664@gmail.com', '558922ec03021', -2, 2, 0, 2, '2025-04-16 09:44:25'),
-('kianr664@gmail.com', '558922ec03021', -2, 2, 0, 2, '2025-04-16 09:44:25'),
-('kianr664@gmail.com', '6073360884420', 0, 3, 2, 2, '2025-04-16 10:50:06'),
-('kianr664@gmail.com', '6073360884420', 0, 3, 2, 2, '2025-04-16 10:50:06');
+('kianr6644@gmail.com', '558922ec03021', 1, 2, 1, 1, '2025-05-14 16:25:42'),
+('kianr6644@gmail.com', '6073360884420', 2, 3, 2, 1, '2025-05-14 17:10:01');
 
 -- --------------------------------------------------------
 
@@ -244,19 +241,20 @@ CREATE TABLE `quiz` (
   `time` bigint(20) NOT NULL,
   `intro` text NOT NULL,
   `tag` varchar(100) NOT NULL,
-  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+  `date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `allow_restart` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `quiz`
 --
 
-INSERT INTO `quiz` (`eid`, `title`, `sahi`, `wrong`, `total`, `time`, `intro`, `tag`, `date`) VALUES
-('558920ff906b8', 'Linux : File Managment', 2, 1, 2, 5, '', 'linux', '2015-06-23 09:03:59'),
-('558921841f1ec', 'Php Coding', 2, 1, 2, 5, '', 'PHP', '2015-06-23 09:06:12'),
-('5589222f16b93', 'C++ Coding', 2, 1, 2, 5, '', 'c++', '2015-06-23 09:09:03'),
-('558922ec03021', 'Networking', 2, 1, 2, 5, '', 'networking', '2015-06-23 09:12:12'),
-('6073360884420', 'Nodejs Term', 2, 2, 3, 2, 'Basic test for nodejs terms', 'nodejs', '2021-04-11 17:46:48');
+INSERT INTO `quiz` (`eid`, `title`, `sahi`, `wrong`, `total`, `time`, `intro`, `tag`, `date`, `allow_restart`) VALUES
+('558920ff906b8', 'Linux : File Managment', 2, 1, 2, 5, '', 'linux', '2015-06-23 09:03:59', 0),
+('558921841f1ec', 'Php Coding', 2, 1, 2, 5, '', 'PHP', '2015-06-23 09:06:12', 0),
+('5589222f16b93', 'C++ Coding', 2, 1, 2, 5, '', 'c++', '2015-06-23 09:09:03', 0),
+('558922ec03021', 'Networking', 2, 1, 2, 5, '', 'networking', '2015-06-23 09:12:12', 0),
+('6073360884420', 'Nodejs Term', 2, 2, 3, 2, 'Basic test for nodejs terms', 'nodejs', '2025-05-14 17:26:00', 1);
 
 -- --------------------------------------------------------
 
@@ -283,7 +281,7 @@ INSERT INTO `rank` (`email`, `score`, `time`) VALUES
 ('clancy@gmail.com', 4, '2021-04-11 13:24:37'),
 ('james@gmail.com', 14, '2021-04-11 17:32:53'),
 ('steeve@gmail.com', 14, '2021-04-11 17:50:15'),
-('kianr664@gmail.com', -4, '2025-04-16 10:50:06');
+('kianr6644@gmail.com', 4, '2025-05-14 17:41:06');
 
 -- --------------------------------------------------------
 
@@ -297,9 +295,9 @@ CREATE TABLE `user` (
   `college` varchar(100) NOT NULL,
   `email` varchar(50) NOT NULL,
   `mob` bigint(20) NOT NULL,
-  `password` varchar(50) NOT NULL,
-  `photo` varchar(255) DEFAULT NULL,
-  `status` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1 = Enabled, 0 = Disabled'
+  `password` varchar(255) NOT NULL,
+  `photo` varchar(255) NOT NULL,
+  `status` tinyint(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
@@ -307,20 +305,27 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`name`, `gender`, `college`, `email`, `mob`, `password`, `photo`, `status`) VALUES
-('Asley', 'F', 'Wh Coast College', 'ashley@gmail.com', 3014797869, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
-('Tom Clancy', 'M', 'Wh Coast College', 'clancy@gmail.com', 1485554569, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
-('John Doe', 'M', 'Demo College', 'doe@gmail.com', 1245788880, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
-('Freda Mack\n', 'F', 'Wh Coast College', 'freda@gmail.com', 2150488880, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
-('James Rhoades', 'M', 'Westham College', 'james@gmail.com', 245778540, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
-('Johnny', 'M', 'Greenville College', 'johnnys@gmail.com', 3780145870, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
-('Rhea M. Melchor.', 'M', 'fewfe', 'jruby13111@gmail.com', 7464, '$2y$10$xzQ/Oui0g4/Vw6lob.Qbm.6gbkcuro4vfm3blZki3TR', 'uploads/user_67fd8c77270f7.png', 1),
-('Rhea M. Melchor.', 'F', 'fewfe', 'jruby13111@gmail.wom', 7464, '$2y$10$koVfG9mkxHKL3pqqZqAhZeR2a9XQE6yDd6q82OtXC..', 'uploads/user_67fd8e96e2ba2.png', 1),
-('Rhea M. Melchor.', 'M', 'fewfe', 'jruby1311@gmail.com', 7464, '$2y$10$m19FU/EZ7VhLqOchEmkjAuD9Un9UrCow/9mzPCM5Bz7', 'uploads/user_67fceafbed4c5.png', 1),
-('Rhea M. Melchor.', 'M', 'fewfe', 'jruby131@gmail.com', 7464, '$2y$10$svc8n3Hj05vbvpxYzA.eFuZaqwNrlTy//c.2mT6MdoU', 'uploads/user_67fce8e5b4ade5.41049439.jpg', 1),
-('Rodriguez, Kian A.', 'M', '3-1', 'kianr664@gmail.com', 3423242, '1edd4a1fe5695e7d4bdfd47c13318201', NULL, 0),
-('Liam', 'M', 'Liberty College', 'liam@gmail.com', 1753150015, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1),
-('Steeve Moore', 'M', 'Westview College', 'steeve@gmail.com', 2146975696, '5f4dcc3b5aa765d61d8327deb882cf99', NULL, 1),
-('William', 'M', 'Riverview College', 'will@gmail.com', 3478540365, 'e10adc3949ba59abbe56e057f20f883e', NULL, 1);
+('Kian A. Rodriguez', 'M', '3F1', 'kianr6644@gmail.com', 9234567654, '$2y$10$hL7pA1pnRbjjGb.SNI1FE.wdDFboGFSEUiWP1kd9z0Vjp7p.9MR3K', 'uploads/user_682480786960b.png', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_exam_settings`
+--
+
+CREATE TABLE `user_exam_settings` (
+  `id` int(11) NOT NULL,
+  `email` varchar(50) NOT NULL,
+  `eid` varchar(50) NOT NULL,
+  `allow_restart` tinyint(1) NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `user_exam_settings`
+--
+
+INSERT INTO `user_exam_settings` (`id`, `email`, `eid`, `allow_restart`) VALUES
+(1, 'kianr6644@gmail.com', '5589222f16b93', 1);
 
 -- --------------------------------------------------------
 
@@ -339,16 +344,58 @@ CREATE TABLE `warning` (
 --
 
 INSERT INTO `warning` (`id`, `timestamp`, `email`) VALUES
-(4, '2025-04-16 12:38:15', 'kianr664@gmail.com'),
-(5, '2025-04-16 12:38:33', 'kianr664@gmail.com'),
-(6, '2025-04-16 12:46:27', 'kianr664@gmail.com'),
-(7, '2025-04-16 12:47:56', 'kianr664@gmail.com'),
-(8, '2025-04-16 12:48:04', 'kianr664@gmail.com'),
-(9, '2025-04-16 12:49:30', 'kianr664@gmail.com'),
-(10, '2025-04-16 12:49:47', 'kianr664@gmail.com'),
-(11, '2025-04-16 12:49:50', 'kianr664@gmail.com'),
-(12, '2025-04-16 13:04:42', 'kianr664@gmail.com'),
-(13, '2025-04-16 13:04:46', 'kianr664@gmail.com');
+(1, '2025-05-14 15:10:45', 'kianr6644@gmail.com'),
+(2, '2025-05-14 17:16:00', 'kianr6644@gmail.com'),
+(3, '2025-05-14 17:16:18', 'kianr6644@gmail.com'),
+(4, '2025-05-14 17:18:13', 'kianr6644@gmail.com'),
+(5, '2025-05-14 17:18:15', 'kianr6644@gmail.com'),
+(6, '2025-05-14 17:19:27', 'kianr6644@gmail.com'),
+(7, '2025-05-14 17:19:40', 'kianr6644@gmail.com'),
+(8, '2025-05-14 17:21:23', 'kianr6644@gmail.com'),
+(9, '2025-05-14 17:21:24', 'kianr6644@gmail.com'),
+(10, '2025-05-14 17:21:26', 'kianr6644@gmail.com'),
+(11, '2025-05-14 17:21:27', 'kianr6644@gmail.com'),
+(12, '2025-05-14 17:27:05', 'kianr6644@gmail.com'),
+(13, '2025-05-14 17:27:30', 'kianr6644@gmail.com'),
+(14, '2025-05-14 17:27:38', 'kianr6644@gmail.com'),
+(15, '2025-05-14 17:27:50', 'kianr6644@gmail.com'),
+(16, '2025-05-14 17:34:30', 'kianr6644@gmail.com'),
+(17, '2025-05-14 17:54:29', 'kianr6644@gmail.com'),
+(18, '2025-05-14 17:55:21', 'kianr6644@gmail.com'),
+(19, '2025-05-14 17:55:22', 'kianr6644@gmail.com'),
+(20, '2025-05-14 18:00:43', 'kianr6644@gmail.com'),
+(21, '2025-05-14 18:00:44', 'kianr6644@gmail.com'),
+(22, '2025-05-14 18:02:49', 'kianr6644@gmail.com'),
+(23, '2025-05-14 18:02:51', 'kianr6644@gmail.com'),
+(24, '2025-05-14 18:03:13', 'kianr6644@gmail.com'),
+(25, '2025-05-14 18:05:06', 'kianr6644@gmail.com'),
+(26, '2025-05-14 18:05:08', 'kianr6644@gmail.com'),
+(27, '2025-05-14 18:06:48', 'kianr6644@gmail.com'),
+(28, '2025-05-14 18:07:01', 'kianr6644@gmail.com'),
+(29, '2025-05-14 18:09:14', 'kianr6644@gmail.com'),
+(30, '2025-05-14 18:09:26', 'kianr6644@gmail.com'),
+(31, '2025-05-14 18:09:55', 'kianr6644@gmail.com'),
+(32, '2025-05-14 18:19:02', 'kianr6644@gmail.com'),
+(33, '2025-05-14 18:19:05', 'kianr6644@gmail.com'),
+(34, '2025-05-14 18:20:40', 'kianr6644@gmail.com'),
+(35, '2025-05-14 18:20:43', 'kianr6644@gmail.com'),
+(36, '2025-05-14 18:20:47', 'kianr6644@gmail.com'),
+(37, '2025-05-14 18:20:49', 'kianr6644@gmail.com'),
+(38, '2025-05-14 18:20:59', 'kianr6644@gmail.com'),
+(39, '2025-05-14 18:21:10', 'kianr6644@gmail.com'),
+(40, '2025-05-14 18:21:22', 'kianr6644@gmail.com'),
+(41, '2025-05-14 18:23:17', 'kianr6644@gmail.com'),
+(42, '2025-05-14 18:55:38', 'kianr6644@gmail.com'),
+(43, '2025-05-14 18:55:48', 'kianr6644@gmail.com'),
+(44, '2025-05-14 18:56:03', 'kianr6644@gmail.com'),
+(45, '2025-05-14 18:56:06', 'kianr6644@gmail.com'),
+(46, '2025-05-14 19:01:24', 'kianr6644@gmail.com'),
+(47, '2025-05-14 19:01:51', 'kianr6644@gmail.com'),
+(48, '2025-05-14 19:03:14', 'kianr6644@gmail.com'),
+(49, '2025-05-14 19:03:15', 'kianr6644@gmail.com'),
+(50, '2025-05-14 19:03:23', 'kianr6644@gmail.com'),
+(51, '2025-05-14 19:03:24', 'kianr6644@gmail.com'),
+(52, '2025-05-14 19:09:48', 'kianr6644@gmail.com');
 
 --
 -- Indexes for dumped tables
@@ -361,6 +408,13 @@ ALTER TABLE `user`
   ADD PRIMARY KEY (`email`);
 
 --
+-- Indexes for table `user_exam_settings`
+--
+ALTER TABLE `user_exam_settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `user_exam` (`email`,`eid`);
+
+--
 -- Indexes for table `warning`
 --
 ALTER TABLE `warning`
@@ -371,10 +425,16 @@ ALTER TABLE `warning`
 --
 
 --
+-- AUTO_INCREMENT for table `user_exam_settings`
+--
+ALTER TABLE `user_exam_settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `warning`
 --
 ALTER TABLE `warning`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
