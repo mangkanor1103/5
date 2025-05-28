@@ -278,9 +278,6 @@ session_start();
                 <a class="nav-item <?php if(@$_GET['q']==5) echo 'active'; ?>" href="dash.php?q=5">
                     <i class="fas fa-exclamation-triangle mr-2"></i> Warnings
                 </a>
-                <a class="nav-item <?php if(@$_GET['q']==6) echo 'active'; ?>" href="dash.php?q=6">
-                    <i class="fas fa-redo-alt mr-2"></i> Restart Settings
-                </a>
             </div>
         </div>
     </nav>
@@ -300,7 +297,6 @@ session_start();
                         else if(@$_GET['q']==3) echo "Feedback";
                         else if(@$_GET['q']==4) echo "Add Exam";
                         else if(@$_GET['q']==5) echo "Warnings";
-                        else if(@$_GET['q']==6) echo "Restart Settings";
                         else echo "Dashboard";
                     ?>
                 </span>
@@ -435,6 +431,11 @@ session_start();
                                     // We already have name and score from our JOIN query
                                     $name = $row['name'];
                                     $s = $row['score'];
+                                    
+                                    // NEW: Get total possible score for this exam
+                                    $examQuery = mysqli_query($con, "SELECT total, sahi FROM quiz WHERE eid='$selected_eid'") or die('Error fetching exam details');
+                                    $examData = mysqli_fetch_array($examQuery);
+                                    $totalPossible = $examData['total'] * $examData['sahi'];
                                 } else {
                                     // For overall rankings, get name from user table
                                     $e = $row['email'];
@@ -444,20 +445,6 @@ session_start();
                                         $name = $row['name'];
                                     }
                                 }
-                                
-                                // Determine remarks based on score
-                                if ($s >= 12) {
-                                    $remarks = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">Excellent</span>';
-                                } elseif ($s >= 9) {
-                                    $remarks = '<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Very Good</span>';
-                                } elseif ($s >= 6) {
-                                    $remarks = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">Good</span>';
-                                } elseif ($s >= 3) {
-                                    $remarks = '<span class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full">Satisfactory</span>';
-                                } else {
-                                    $remarks = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full">Needs Improvement</span>';
-                                }
-                                
                                 $c++;
                                 echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
                                     <td class="px-4 py-4">';
@@ -467,8 +454,48 @@ session_start();
                                     else echo $c;
                                     echo '</td>
                                     <td class="px-4 py-4 font-medium">'.$name.'</td>
-                                    <td class="px-4 py-4 text-center text-primary font-bold">'.$s.'</td>
-                                    <td class="px-4 py-4 text-center">'.$remarks.'</td>
+                                    <td class="px-4 py-4 text-center text-primary font-bold">';
+                                    
+                                    // Display score as fraction for specific exams
+                                    if (!empty($selected_eid)) {
+                                        echo $s . ' / ' . $totalPossible;
+                                    } else {
+                                        echo $s;
+                                    }
+                                    
+                                    echo '</td>
+                                    <td class="px-4 py-4 text-center">';
+                                    
+                                    // Add remarks based on score
+                                    if (!empty($selected_eid)) {
+                                        // Calculate percentage
+                                        $percentage = ($s / $totalPossible) * 100;
+                                        
+                                        if ($percentage >= 90) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">Excellent (A)</span>';
+                                        } else if ($percentage >= 85) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Very Satisfactory (B+)</span>';
+                                        } else if ($percentage >= 80) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Satisfactory (B)</span>';
+                                        } else if ($percentage >= 75) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Fairly Satisfactory (C)</span>';
+                                        } else {
+                                            echo '<span class="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">Did Not Meet Expectations (F)</span>';
+                                        }
+                                    } else {
+                                        // For overall rankings, just show general performance indicators
+                                        if ($s >= 100) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">Outstanding</span>';
+                                        } else if ($s >= 75) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Satisfactory</span>';
+                                        } else if ($s >= 50) {
+                                            echo '<span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Fair</span>';
+                                        } else {
+                                            echo '<span class="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">Needs Improvement</span>';
+                                        }
+                                    }
+                                    
+                                    echo '</td>
                                 </tr>';
                             }
                             echo '</tbody></table></div>';
@@ -715,7 +742,16 @@ session_start();
                         <h2 class="panel-title">Add Questions</h2>
                         <p class="text-gray-600 mb-6">Create questions for your exam.</p>
                         
-                        <div class="bg-gray-50 p-6 rounded-xl shadow-md">
+                        <!-- Tabs for question entry methods -->
+                        <div class="mb-6">
+                            <div class="flex border-b border-gray-200">
+                                <button id="individualTab" class="px-4 py-2 font-medium text-primary border-b-2 border-primary" onclick="switchTab('individual')">Individual Questions</button>
+                                <button id="bulkTab" class="px-4 py-2 font-medium text-gray-500 hover:text-primary" onclick="switchTab('bulk')">Bulk Import</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Individual Questions Form -->
+                        <div id="individualForm" class="bg-gray-50 p-6 rounded-xl shadow-md">
                             <form class="form-horizontal" name="form" action="update.php?q=addqns&n=<?php echo @$_GET['n']; ?>&eid=<?php echo @$_GET['eid']; ?>&ch=4" method="POST">
                                 <?php
                                 for($i=1; $i<=@$_GET['n']; $i++) {
@@ -767,253 +803,187 @@ session_start();
                                 </div>
                             </form>
                         </div>
+                        
+                        <!-- Bulk Import Form -->
+                        <div id="bulkForm" class="bg-gray-50 p-6 rounded-xl shadow-md hidden">
+                            <form class="form-horizontal" name="bulkform" action="update.php?q=addbulkqns&eid=<?php echo @$_GET['eid']; ?>&ch=4" method="POST">
+                                <input type="hidden" name="n" value="<?php echo @$_GET['n']; ?>">
+                                
+                                <div class="mb-6">
+                                    <h3 class="text-lg font-semibold mb-2 text-primary">Bulk Questions Import</h3>
+                                    <p class="text-gray-600 mb-4">Paste your questions in the following format (one question per line):</p>
+                                    <div class="bg-gray-100 p-4 rounded-lg mb-4 text-sm font-mono">
+                                        <p>Question text | Option A | Option B | Option C | Option D | Correct Answer (a,b,c,d)</p>
+                                        <p>Example: What is 2+2? | 3 | 4 | 5 | 6 | b</p>
+                                    </div>
+                                    <textarea rows="15" name="bulk_questions" class="form-input font-mono text-sm" placeholder="Paste your questions here..."></textarea>
+                                </div>
+                                
+                                <div class="mt-8 flex justify-end">
+                                    <button type="submit" class="btn-primary inline-flex items-center justify-center space-x-2 text-lg">
+                                        <i class="fas fa-file-import"></i>
+                                        <span>Import Questions</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <script>
+                            function switchTab(tab) {
+                                // Hide all forms
+                                document.getElementById('individualForm').classList.add('hidden');
+                                document.getElementById('bulkForm').classList.add('hidden');
+                                
+                                // Remove active class from all tabs
+                                document.getElementById('individualTab').classList.remove('border-primary', 'text-primary');
+                                document.getElementById('individualTab').classList.add('text-gray-500');
+                                document.getElementById('bulkTab').classList.remove('border-primary', 'text-primary');
+                                document.getElementById('bulkTab').classList.add('text-gray-500');
+                                
+                                // Show selected form and activate tab
+                                if (tab === 'individual') {
+                                    document.getElementById('individualForm').classList.remove('hidden');
+                                    document.getElementById('individualTab').classList.add('border-b-2', 'border-primary', 'text-primary');
+                                    document.getElementById('individualTab').classList.remove('text-gray-500');
+                                } else {
+                                    document.getElementById('bulkForm').classList.remove('hidden');
+                                    document.getElementById('bulkTab').classList.add('border-b-2', 'border-primary', 'text-primary');
+                                    document.getElementById('bulkTab').classList.remove('text-gray-500');
+                                }
+                            }
+                        </script>
                     <?php } ?>
 
                     <?php if(@$_GET['q']==5) { ?>
-                        <h2 class="panel-title">Warning Records</h2>
-                        <p class="text-gray-600 mb-6">Manage users with warnings and control their account status.</p>
+                        <h2 class="panel-title">System Warnings</h2>
+                        <p class="text-gray-600 mb-6">Monitor system warnings and potential issues.</p>
                         
                         <?php
-                        // Check if an enable/disable action is triggered
-                        if (isset($_GET['action']) && isset($_GET['user_email'])) {
-                            $userEmail = $_GET['user_email'];
-                            $action = $_GET['action'];
-                            $status = ($action === 'enable') ? 1 : 0;
-
-                            $updateSql = "UPDATE user SET status = $status WHERE email = '$userEmail'";
-                            if ($con->query($updateSql) === TRUE) {
-                                echo '<div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
-                                    <p>User status updated successfully!</p>
-                                </div>';
-                            } else {
-                                echo '<div class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded">
-                                    <p>Failed to update user status: ' . $con->error . '</p>
-                                </div>';
+                        // Check for various system warnings
+                        $warnings = array();
+                        
+                        // 1. Check for quizzes with no questions
+                        $empty_quiz_result = mysqli_query($con, "SELECT q.eid, q.title 
+                                           FROM quiz q 
+                                           LEFT JOIN questions qn ON q.eid = qn.eid 
+                                           WHERE qn.eid IS NULL") or die('Error');
+                        while($row = mysqli_fetch_array($empty_quiz_result)) {
+                            $warnings[] = array(
+                                'type' => 'empty_quiz',
+                                'severity' => 'high',
+                                'message' => 'Quiz "'.$row['title'].'" has no questions',
+                                'eid' => $row['eid']
+                            );
+                        }
+                        
+                        // 2. Check for users who haven't taken any quiz
+                        $inactive_users_result = mysqli_query($con, "SELECT u.email, u.name 
+                                               FROM user u 
+                                               LEFT JOIN history h ON u.email = h.email 
+                                               WHERE h.email IS NULL") or die('Error');
+                        while($row = mysqli_fetch_array($inactive_users_result)) {
+                            $warnings[] = array(
+                                'type' => 'inactive_user',
+                                'severity' => 'medium',
+                                'message' => 'User "'.$row['name'].'" has not taken any quiz yet',
+                                'email' => $row['email']
+                            );
+                        }
+                        
+                        // 3. Check for quizzes with low performance (high failure rate)
+                        $quiz_performance_result = mysqli_query($con, "SELECT q.eid, q.title, q.total, q.sahi,
+                                                COUNT(h.email) as attempts,
+                                                AVG(h.score) as avg_score
+                                                FROM quiz q
+                                                JOIN history h ON q.eid = h.eid
+                                                GROUP BY q.eid
+                                                HAVING COUNT(h.email) > 3") or die('Error');
+                        while($row = mysqli_fetch_array($quiz_performance_result)) {
+                            $max_score = $row['total'] * $row['sahi'];
+                            $avg_percent = ($row['avg_score'] / $max_score) * 100;
+                            
+                            if($avg_percent < 60) {
+                                $warnings[] = array(
+                                    'type' => 'low_performance',
+                                    'severity' => 'medium',
+                                    'message' => 'Quiz "'.$row['title'].'" has low average performance ('.round($avg_percent, 1).'%)',
+                                    'eid' => $row['eid']
+                                );
                             }
                         }
-
-                        // Fetch and group data from the warning table
-                        $query = "SELECT u.email, COUNT(w.email) AS warning_count, u.status 
-                                  FROM warning w 
-                                  RIGHT JOIN user u ON w.email = u.email 
-                                  GROUP BY u.email, u.status 
-                                  ORDER BY warning_count DESC";
-                        $result = $con->query($query);
                         
-                        if ($result->num_rows > 0) {
+                        // Display warnings
+                        if(count($warnings) > 0) {
                             echo '<div class="overflow-x-auto">
-                                <table class="min-w-full bg-white border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-50 border-b-2 border-gray-200">
-                                        <th class="px-4 py-3 text-left">Email</th>
-                                        <th class="px-4 py-3 text-center">Warnings</th>
-                                        <th class="px-4 py-3 text-center">Status</th>
-                                        <th class="px-4 py-3 text-center">Remarks</th>
-                                        <th class="px-4 py-3 text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>';
+                            <table class="min-w-full bg-white border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 border-b-2 border-gray-200">
+                                    <th class="px-4 py-3 text-left">Warning</th>
+                                    <th class="px-4 py-3 text-left">Severity</th>
+                                    <th class="px-4 py-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>';
                             
-                            while ($row = $result->fetch_assoc()) {
-                                $statusClass = $row['status'] == 1 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                                $warningCount = (int)$row['warning_count'];
+                            foreach($warnings as $warning) {
+                                echo '<tr class="border-b border-gray-200 hover:bg-gray-50">';
                                 
-                                // Determine remarks based on warning count
-                                if ($warningCount >= 40) {
-                                    $remarks = '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full">Critical Violation</span>';
-                                } elseif ($warningCount >= 30) {
-                                    $remarks = '<span class="px-2 py-1 bg-orange-100 text-orange-800 rounded-full">Severe Violation</span>';
-                                } elseif ($warningCount >= 20) {
-                                    $remarks = '<span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">Major Violation</span>';
-                                } elseif ($warningCount >= 10) {
-                                    $remarks = '<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Moderate Violation</span>';
-                                } elseif ($warningCount > 0) {
-                                    $remarks = '<span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full">Minor Violation</span>';
-                                } else {
-                                    $remarks = '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full">No Violations</span>';
+                                // Warning message
+                                echo '<td class="px-4 py-4">';
+                                
+                                // Icon based on warning type
+                                if($warning['type'] == 'empty_quiz') {
+                                    echo '<div class="flex items-center"><i class="fas fa-exclamation-circle text-yellow-500 mr-2"></i> ';
+                                } else if($warning['type'] == 'inactive_user') {
+                                    echo '<div class="flex items-center"><i class="fas fa-user-clock text-blue-500 mr-2"></i> ';
+                                } else if($warning['type'] == 'low_performance') {
+                                    echo '<div class="flex items-center"><i class="fas fa-chart-line text-red-500 mr-2"></i> ';
                                 }
                                 
-                                echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="px-4 py-4 font-medium">' . htmlspecialchars($row['email']) . '</td>
-                                    <td class="px-4 py-4 text-center">' . htmlspecialchars($row['warning_count']) . '</td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="px-2 py-1 rounded-full text-xs font-semibold ' . $statusClass . '">
-                                            ' . ($row['status'] == 1 ? 'Enabled' : 'Disabled') . '
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">' . $remarks . '</td>
-                                    <td class="px-4 py-4 text-center">';
+                                echo $warning['message'].'</div></td>';
                                 
-                                if ($row['status'] == 1) {
-                                    echo '<a href="dash.php?q=5&action=disable&user_email=' . urlencode($row['email']) . '" 
-                                        class="btn-secondary inline-flex items-center justify-center space-x-1 py-1 px-3"
-                                        onclick="return confirm(\'Are you sure you want to disable this user?\');">
-                                        <i class="fas fa-user-slash"></i>
-                                        <span>Disable</span>
-                                    </a>';
+                                // Severity
+                                echo '<td class="px-4 py-4">';
+                                if($warning['severity'] == 'high') {
+                                    echo '<span class="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">High</span>';
+                                } else if($warning['severity'] == 'medium') {
+                                    echo '<span class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">Medium</span>';
                                 } else {
-                                    echo '<a href="dash.php?q=5&action=enable&user_email=' . urlencode($row['email']) . '" 
-                                        class="btn-primary inline-flex items-center justify-center space-x-1 py-1 px-3">
-                                        <i class="fas fa-user-check"></i>
-                                        <span>Enable</span>
+                                    echo '<span class="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">Low</span>';
+                                }
+                                echo '</td>';
+                                
+                                // Actions
+                                echo '<td class="px-4 py-4 text-center">';
+                                if($warning['type'] == 'empty_quiz') {
+                                    echo '<a href="dash.php?q=4&step=1&eid='.$warning['eid'].'" class="btn-primary inline-flex items-center justify-center space-x-1 py-1 px-3">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Add Questions</span>
+                                    </a>';
+                                } else if($warning['type'] == 'inactive_user') {
+                                    echo '<a href="mailto:'.$warning['email'].'" class="btn-primary inline-flex items-center justify-center space-x-1 py-1 px-3">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Contact User</span>
+                                    </a>';
+                                } else if($warning['type'] == 'low_performance') {
+                                    echo '<a href="dash.php?q=0&review='.$warning['eid'].'" class="btn-primary inline-flex items-center justify-center space-x-1 py-1 px-3">
+                                        <i class="fas fa-search"></i>
+                                        <span>Review Quiz</span>
                                     </a>';
                                 }
-                                
                                 echo '</td></tr>';
                             }
                             
                             echo '</tbody></table></div>';
                         } else {
                             echo '<div class="text-center p-8 bg-gray-50 rounded-lg">
-                                <i class="fas fa-exclamation-circle text-4xl text-gray-400 mb-3"></i>
-                                <p class="text-gray-500">No warnings found in the database.</p>
+                                <i class="fas fa-check-circle text-5xl text-green-500 mb-3"></i>
+                                <p class="text-gray-700 font-medium mb-2">No warnings found</p>
+                                <p class="text-gray-500">The system is running smoothly with no detected issues.</p>
                             </div>';
                         }
                         ?>
                     <?php } ?>
-
-                    <?php if(@$_GET['q']==6) { ?>
-                        <h2 class="panel-title">Exam Restart Permissions</h2>
-                        <p class="text-gray-600 mb-6">Manage which users are allowed to restart exams they have already taken.</p>
-                        
-                        <?php
-                        // Process permission updates if submitted
-                        if(isset($_POST['update_permissions'])) {
-                            $user_email = mysqli_real_escape_string($con, $_POST['user_email']);
-                            $exam_id = mysqli_real_escape_string($con, $_POST['exam_id']);
-                            $allow_restart = isset($_POST['allow_restart']) ? 1 : 0;
-                            
-                            // Check if a record already exists
-                            $check_query = mysqli_query($con, "SELECT * FROM user_exam_settings WHERE email='$user_email' AND eid='$exam_id'");
-                            
-                            if(mysqli_num_rows($check_query) > 0) {
-                                // Update existing record
-                                mysqli_query($con, "UPDATE user_exam_settings SET allow_restart='$allow_restart' WHERE email='$user_email' AND eid='$exam_id'") 
-                                    or die("Error updating permission: " . mysqli_error($con));
-                            } else {
-                                // Insert new record
-                                mysqli_query($con, "INSERT INTO user_exam_settings (email, eid, allow_restart) VALUES ('$user_email', '$exam_id', '$allow_restart')")
-                                    or die("Error inserting permission: " . mysqli_error($con));
-                            }
-                            
-                            echo '<div class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded">
-                                <p>Restart permission updated successfully!</p>
-                            </div>';
-                        }
-                        
-                        // Form for setting new permissions
-                        ?>
-                        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
-                            <h3 class="text-xl font-semibold mb-6 text-primary">Set Restart Permission</h3>
-                            
-                            <form method="post" action="dash.php?q=6" class="space-y-6">
-                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label class="form-label">Select User</label>
-                                        <select name="user_email" class="form-input" required>
-                                            <option value="">-- Select User --</option>
-                                            <?php
-                                            $users_result = mysqli_query($con, "SELECT email, name FROM user ORDER BY name ASC");
-                                            while($user = mysqli_fetch_array($users_result)) {
-                                                echo '<option value="'.$user['email'].'">'.$user['name'].' ('.$user['email'].')</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                    
-                                    <div>
-                                        <label class="form-label">Select Exam</label>
-                                        <select name="exam_id" class="form-input" required>
-                                            <option value="">-- Select Exam --</option>
-                                            <?php
-                                            $exams_result = mysqli_query($con, "SELECT eid, title FROM quiz ORDER BY title ASC");
-                                            while($exam = mysqli_fetch_array($exams_result)) {
-                                                echo '<option value="'.$exam['eid'].'">'.$exam['title'].'</option>';
-                                            }
-                                            ?>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="flex items-end">
-                                        <label class="inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" name="allow_restart" value="1" class="h-5 w-5 text-primary rounded border-gray-300">
-                                            <span class="ml-2 text-gray-700">Allow Restart</span>
-                                        </label>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex justify-end">
-                                    <button type="submit" name="update_permissions" class="btn-primary inline-flex items-center justify-center space-x-2">
-                                        <i class="fas fa-save"></i>
-                                        <span>Save Permission</span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                        
-                        <?php
-                        // Display existing permissions
-                        $permissions_query = mysqli_query($con, "
-                            SELECT s.email, s.eid, s.allow_restart, u.name as username, q.title as exam_title 
-                            FROM user_exam_settings s
-                            JOIN user u ON s.email = u.email
-                            JOIN quiz q ON s.eid = q.eid
-                            ORDER BY u.name ASC, q.title ASC
-                        ");
-                        
-                        if(mysqli_num_rows($permissions_query) > 0) {
-                            echo '<div class="bg-white rounded-xl shadow-md p-6">
-                                <h3 class="text-xl font-semibold mb-6 text-primary">Current Restart Permissions</h3>
-                                <div class="overflow-x-auto">
-                                    <table class="min-w-full bg-white border-collapse">
-                                        <thead>
-                                            <tr class="bg-gray-50 border-b-2 border-gray-200">
-                                                <th class="px-4 py-3 text-left">User</th>
-                                                <th class="px-4 py-3 text-left">Email</th>
-                                                <th class="px-4 py-3 text-left">Exam</th>
-                                                <th class="px-4 py-3 text-center">Restart Status</th>
-                                                <th class="px-4 py-3 text-center">Actions</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>';
-                            
-                            while($row = mysqli_fetch_array($permissions_query)) {
-                                $status_class = $row['allow_restart'] ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                                $status_text = $row['allow_restart'] ? 'Allowed' : 'Not Allowed';
-                                
-                                echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
-                                    <td class="px-4 py-4 font-medium">'.htmlspecialchars($row['username']).'</td>
-                                    <td class="px-4 py-4">'.htmlspecialchars($row['email']).'</td>
-                                    <td class="px-4 py-4">'.htmlspecialchars($row['exam_title']).'</td>
-                                    <td class="px-4 py-4 text-center">
-                                        <span class="px-2 py-1 rounded-full text-xs font-semibold '.$status_class.'">
-                                            '.$status_text.'
-                                        </span>
-                                    </td>
-                                    <td class="px-4 py-4 text-center">
-                                        <form method="post" action="dash.php?q=6" class="inline">
-                                            <input type="hidden" name="user_email" value="'.$row['email'].'">
-                                            <input type="hidden" name="exam_id" value="'.$row['eid'].'">
-                                            <input type="hidden" name="allow_restart" value="'.($row['allow_restart'] ? '0' : '1').'">
-                                            <button type="submit" name="update_permissions" class="btn-'.($row['allow_restart'] ? 'secondary' : 'primary').' inline-flex items-center justify-center space-x-1 py-1 px-3">
-                                                <i class="fas fa-'.($row['allow_restart'] ? 'ban' : 'check').'"></i>
-                                                <span>'.($row['allow_restart'] ? 'Revoke' : 'Allow').'</span>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>';
-                            }
-                            
-                            echo '</tbody></table></div></div>';
-                        } else {
-                            echo '<div class="text-center p-8 bg-gray-50 rounded-lg">
-                                <i class="fas fa-info-circle text-4xl text-gray-400 mb-3"></i>
-                                <p class="text-gray-500">No restart permissions have been set yet.</p>
-                            </div>';
-                        }
-                        ?>
-                    <?php } ?>
-                    
                 </div>
             </div>
         </div>

@@ -51,9 +51,13 @@ $time = $_POST['time'];
 $tag = $_POST['tag'];
 $desc = $_POST['desc'];
 $id=uniqid();
-$q3=mysqli_query($con,"INSERT INTO quiz VALUES  ('$id','$name' , '$sahi' , '$wrong','$total','$time' ,'$desc','$tag', NOW())");
-
-header("location:dash.php?q=4&step=2&eid=$id&n=$total");
+$q3=mysqli_query($con,"INSERT INTO quiz (eid, title, sahi, wrong, total, time, intro, tag, date, allow_restart) 
+                      VALUES ('$id','$name','$sahi','$wrong','$total','$time','$desc','$tag', NOW(), 0)");
+if($q3) {
+    header("location:dash.php?q=4&step=1&eid=$id&n=$total");
+} else {
+    echo "<script>alert('Error: " . mysqli_error($con) . "'); window.location.href='dash.php?q=4';</script>";
+}
 }
 }
 
@@ -105,6 +109,87 @@ $qans=mysqli_query($con,"INSERT INTO answer VALUES  ('$qid','$ansid')");
 
  }
 header("location:dash.php?q=0");
+}
+}
+
+//add bulk questions
+if(isset($_SESSION['key'])){
+if(@$_GET['q']== 'addbulkqns' && $_SESSION['key']=='sunny7785068889') {
+$eid=@$_GET['eid'];
+$ch=@$_GET['ch'];
+$total = isset($_POST['n']) ? (int)$_POST['n'] : 0;
+$bulk_questions = isset($_POST['bulk_questions']) ? trim($_POST['bulk_questions']) : '';
+
+// Parse bulk questions
+$lines = explode("\n", $bulk_questions);
+$lines = array_filter(array_map('trim', $lines)); // Remove empty lines
+$success_count = 0;
+
+if(count($lines) > 0) {
+    foreach($lines as $i => $line) {
+        // Skip if we've reached the total number of questions
+        if($success_count >= $total) {
+            break;
+        }
+        
+        // Split the line by the pipe character
+        $parts = array_map('trim', explode('|', $line));
+        
+        // Check if we have all parts (question, 4 options, and answer)
+        if(count($parts) >= 6) {
+            $qid = uniqid();
+            $qns = $parts[0];
+            $success = true;
+            
+            // Insert question
+            $q3 = mysqli_query($con, "INSERT INTO questions VALUES ('$eid','$qid','$qns','$ch','" . ($success_count + 1) . "')");
+            if(!$q3) {
+                $success = false;
+            }
+            
+            // Insert options
+            $option_ids = [];
+            for($j = 1; $j <= 4; $j++) {
+                $option_text = isset($parts[$j]) ? $parts[$j] : '';
+                $option_id = uniqid();
+                $option_ids[$j] = $option_id;
+                
+                $q_option = mysqli_query($con, "INSERT INTO options VALUES ('$qid','$option_text','$option_id')");
+                if(!$q_option) {
+                    $success = false;
+                }
+            }
+            
+            // Insert answer based on the specified letter
+            $ans_letter = strtolower(isset($parts[5]) ? trim($parts[5]) : 'a');
+            switch($ans_letter) {
+                case 'a': $ansid = $option_ids[1]; break;
+                case 'b': $ansid = $option_ids[2]; break;
+                case 'c': $ansid = $option_ids[3]; break;
+                case 'd': $ansid = $option_ids[4]; break;
+                default: $ansid = $option_ids[1]; // Default to first option
+            }
+            
+            $q_ans = mysqli_query($con, "INSERT INTO answer VALUES ('$qid','$ansid')");
+            if(!$q_ans) {
+                $success = false;
+            }
+            
+            if($success) {
+                $success_count++;
+            }
+        }
+    }
+    
+    if($success_count > 0) {
+        echo "<script>alert('Successfully imported $success_count questions.'); window.location.href='dash.php?q=0';</script>";
+    } else {
+        echo "<script>alert('No questions were imported. Please check your format and try again.'); window.location.href='dash.php?q=4&step=1&eid=$eid&n=$total';</script>";
+    }
+} else {
+    echo "<script>alert('No questions found to import.'); window.location.href='dash.php?q=4&step=1&eid=$eid&n=$total';</script>";
+}
+
 }
 }
 
