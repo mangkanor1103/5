@@ -321,6 +321,7 @@ session_start();
                                         <th class="px-4 py-3 text-center">Questions</th>
                                         <th class="px-4 py-3 text-center">Marks</th>
                                         <th class="px-4 py-3 text-center">Time</th>
+                                        <th class="px-4 py-3 text-center">Restart</th>
                                         <th class="px-4 py-3 text-center">Actions</th>
                                     </tr>
                                 </thead>
@@ -332,12 +333,25 @@ session_start();
                                 $sahi = $row['sahi'];
                                 $time = $row['time'];
                                 $eid = $row['eid'];
+                                $allow_restart = $row['allow_restart'];
+                                
                                 echo '<tr class="border-b border-gray-200 hover:bg-gray-50">
                                     <td class="px-4 py-4">'.$c++.'</td>
                                     <td class="px-4 py-4 font-medium">'.$title.'</td>
                                     <td class="px-4 py-4 text-center">'.$total.'</td>
                                     <td class="px-4 py-4 text-center">'.$sahi*$total.'</td>
                                     <td class="px-4 py-4 text-center">'.$time.'&nbsp;min</td>
+                                    <td class="px-4 py-4 text-center">';
+                                
+                                if($allow_restart == 1) {
+                                    echo '<span class="px-2 py-1 rounded-full bg-green-100 text-green-800 text-xs font-semibold">Enabled</span>
+                                        <a href="update.php?action=toggle_restart&eid='.$eid.'&val=0" class="ml-2 text-sm text-blue-500 hover:underline">Disable</a>';
+                                } else {
+                                    echo '<span class="px-2 py-1 rounded-full bg-red-100 text-red-800 text-xs font-semibold">Disabled</span>
+                                        <a href="update.php?action=toggle_restart&eid='.$eid.'&val=1" class="ml-2 text-sm text-blue-500 hover:underline">Enable</a>';
+                                }
+                                
+                                echo '</td>
                                     <td class="px-4 py-4 text-center">
                                         <a href="update.php?q=rmquiz&eid='.$eid.'" class="btn-secondary inline-flex items-center justify-center space-x-1 py-2 px-4" onclick="return confirm(\'Are you sure you want to remove this exam?\');">
                                             <i class="fas fa-trash-alt"></i>
@@ -723,6 +737,20 @@ session_start();
                                         <label for="tag" class="form-label">Tag</label>
                                         <input id="tag" name="tag" placeholder="Enter #tag for searching" class="form-input" type="text">
                                     </div>
+                                    <div class="mb-4">
+                                        <label class="form-label">Allow Exam Restart</label>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex items-center">
+                                                <input type="radio" id="restart_yes" name="allow_restart" value="1" class="mr-2">
+                                                <label for="restart_yes">Yes</label>
+                                            </div>
+                                            <div class="flex items-center">
+                                                <input type="radio" id="restart_no" name="allow_restart" value="0" class="mr-2" checked>
+                                                <label for="restart_no">No</label>
+                                            </div>
+                                        </div>
+                                        <p class="text-gray-500 text-sm mt-1">If enabled, users can take this exam multiple times</p>
+                                    </div>
                                 </div>
                                 <div class="mb-4">
                                     <label for="desc" class="form-label">Description</label>
@@ -912,6 +940,17 @@ session_start();
                             }
                         }
                         
+                        // 4. Check for disabled users
+                        $disabled_users_result = mysqli_query($con, "SELECT email, name, status FROM user WHERE status=0") or die('Error checking disabled users');
+                        while($row = mysqli_fetch_array($disabled_users_result)) {
+                            $warnings[] = array(
+                                'type' => 'disabled_user',
+                                'severity' => 'high',
+                                'message' => 'User "'.$row['name'].'" has been disabled',
+                                'email' => $row['email']
+                            );
+                        }
+                        
                         // Display warnings
                         if(count($warnings) > 0) {
                             echo '<div class="overflow-x-auto">
@@ -938,6 +977,8 @@ session_start();
                                     echo '<div class="flex items-center"><i class="fas fa-user-clock text-blue-500 mr-2"></i> ';
                                 } else if($warning['type'] == 'low_performance') {
                                     echo '<div class="flex items-center"><i class="fas fa-chart-line text-red-500 mr-2"></i> ';
+                                } else if($warning['type'] == 'disabled_user') {
+                                    echo '<div class="flex items-center"><i class="fas fa-user-slash text-red-500 mr-2"></i> ';
                                 }
                                 
                                 echo $warning['message'].'</div></td>';
@@ -969,6 +1010,11 @@ session_start();
                                     echo '<a href="dash.php?q=0&review='.$warning['eid'].'" class="btn-primary inline-flex items-center justify-center space-x-1 py-1 px-3">
                                         <i class="fas fa-search"></i>
                                         <span>Review Quiz</span>
+                                    </a>';
+                                } else if($warning['type'] == 'disabled_user') {
+                                    echo '<a href="update.php?action=enable_user&email='.$warning['email'].'" class="btn-primary inline-flex items-center justify-center space-x-1 py-1 px-3">
+                                        <i class="fas fa-user-check"></i>
+                                        <span>Enable User</span>
                                     </a>';
                                 }
                                 echo '</td></tr>';

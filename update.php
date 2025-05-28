@@ -50,15 +50,23 @@ $wrong = $_POST['wrong'];
 $time = $_POST['time'];
 $tag = $_POST['tag'];
 $desc = $_POST['desc'];
+$allow_restart = isset($_POST['allow_restart']) ? $_POST['allow_restart'] : 0;
 $id=uniqid();
 $q3=mysqli_query($con,"INSERT INTO quiz (eid, title, sahi, wrong, total, time, intro, tag, date, allow_restart) 
-                      VALUES ('$id','$name','$sahi','$wrong','$total','$time','$desc','$tag', NOW(), 0)");
-if($q3) {
-    header("location:dash.php?q=4&step=1&eid=$id&n=$total");
-} else {
-    echo "<script>alert('Error: " . mysqli_error($con) . "'); window.location.href='dash.php?q=4';</script>";
+                      VALUES ('$id','$name','$sahi','$wrong','$total','$time','$desc','$tag', NOW(), '$allow_restart')");
+
+header("location:dash.php?q=4&step=1&eid=$id&n=$total");
 }
 }
+
+//toggle restart setting
+if(isset($_SESSION['key'])){
+    if(@$_GET['action'] == 'toggle_restart' && isset($_GET['eid']) && isset($_GET['val']) && $_SESSION['key']=='sunny7785068889') {
+        $eid = $_GET['eid'];
+        $val = $_GET['val'];
+        $result = mysqli_query($con,"UPDATE quiz SET allow_restart='$val' WHERE eid='$eid'") or die('Error toggling restart setting');
+        header("location:dash.php?q=0");
+    }
 }
 
 //add question
@@ -321,6 +329,14 @@ if (isset($_GET['demail'])) {
     }
 }
 
+//enable user
+if(isset($_SESSION['key'])){
+    if(@$_GET['action'] == 'enable_user' && isset($_GET['email']) && $_SESSION['key']=='sunny7785068889') {
+        $email = $_GET['email'];
+        $result = mysqli_query($con,"UPDATE user SET status=1 WHERE email='$email'") or die('Error enabling user');
+        header("location:dash.php?q=5");
+    }
+}
 ?>
 
 
