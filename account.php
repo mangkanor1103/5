@@ -332,8 +332,8 @@ if (!isset($_SESSION['welcomed'])) {
                                 $q12 = mysqli_query($con, "SELECT score FROM history WHERE eid='$eid' AND email='$email'") or die('Error98');
                                 $rowcount = mysqli_num_rows($q12);
                                 
-                                // Check if restart is allowed for this user/exam
-                                $restart_query = mysqli_query($con, "SELECT allow_restart FROM user_exam_settings WHERE eid='$eid' AND email='$email'") or die('Error');
+                                // Check if restart is allowed for this quiz directly from the quiz table
+                                $restart_query = mysqli_query($con, "SELECT allow_restart FROM quiz WHERE eid='$eid'") or die('Error checking restart permission');
                                 $restart_allowed = false;
                                 
                                 if (mysqli_num_rows($restart_query) > 0) {
