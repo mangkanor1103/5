@@ -337,6 +337,137 @@ if(isset($_SESSION['key'])){
         header("location:dash.php?q=5");
     }
 }
+
+// Handle edit quiz
+if(@$_GET['q']=='editquiz') {
+    $eid = $_GET['eid'];
+    $name = $_POST['name'];
+    $total = $_POST['total'];
+    $right = $_POST['right'];
+    $wrong = $_POST['wrong'];
+    $time = $_POST['time'];
+    $tag = $_POST['tag'];
+    $desc = $_POST['desc'];
+    $allow_restart = $_POST['allow_restart'];
+    
+    $query = "UPDATE quiz SET 
+              title='$name', 
+              total='$total', 
+              sahi='$right', 
+              wrong='$wrong', 
+              time='$time', 
+              tag='$tag', 
+              intro='$desc', 
+              allow_restart='$allow_restart' 
+              WHERE eid='$eid'";
+    
+    if(mysqli_query($con, $query)) {
+        echo "<script>alert('Exam updated successfully!'); window.location.href='dash.php?q=0';</script>";
+    } else {
+        echo "<script>alert('Error updating exam!'); window.location.href='dash.php?q=0&edit=$eid';</script>";
+    }
+}
+
+// Handle bulk add questions
+if(@$_GET['q']=='addbulkqns') {
+    $eid = $_GET['eid'];
+    $ch = $_GET['ch'];
+    
+    $bulk_questions = $_POST['bulk_questions'];
+    $lines = explode("\n", trim($bulk_questions));
+    
+    $questions_added = 0;
+    $errors = array();
+    
+    foreach($lines as $line_num => $line) {
+        $line = trim($line);
+        if(empty($line)) continue;
+        
+        $parts = explode('|', $line);
+        if(count($parts) !== 6) {
+            $errors[] = "Line " . ($line_num + 1) . ": Invalid format (expected 6 parts separated by |)";
+            continue;
+        }
+        
+        $qns = trim($parts[0]);
+        $choice1 = trim($parts[1]);
+        $choice2 = trim($parts[2]);
+        $choice3 = trim($parts[3]);
+        $choice4 = trim($parts[4]);
+        $ans = strtolower(trim($parts[5]));
+        
+        // Validate answer
+        if(!in_array($ans, ['a', 'b', 'c', 'd'])) {
+            $errors[] = "Line " . ($line_num + 1) . ": Invalid answer '$ans' (must be a, b, c, or d)";
+            continue;
+        }
+        
+        // Insert question
+        $query = "INSERT INTO questions (eid, qns, choice1, choice2, choice3, choice4, ans) 
+                  VALUES ('$eid', '$qns', '$choice1', '$choice2', '$choice3', '$choice4', '$ans')";
+        
+        if(mysqli_query($con, $query)) {
+            $questions_added++;
+        } else {
+            $errors[] = "Line " . ($line_num + 1) . ": Database error - " . mysqli_error($con);
+        }
+    }
+    
+    $message = "$questions_added question(s) imported successfully!";
+    if(!empty($errors)) {
+        $message .= "\\n\\nErrors:\\n" . implode("\\n", $errors);
+    }
+    
+    echo "<script>alert('$message'); window.location.href='dash.php?q=4&step=1&eid=$eid';</script>";
+}
+
+// Handle edit question
+if(@$_GET['q']=='editquestion') {
+    $qid = $_POST['qid'];
+    $eid = $_POST['eid'];
+    $question = $_POST['question'];
+    $choices = [$_POST['choice1'], $_POST['choice2'], $_POST['choice3'], $_POST['choice4']];
+    $answer = $_POST['answer'];
+    
+    // Update question
+    $query = "UPDATE questions SET qns='$question' WHERE qid='$qid'";
+    mysqli_query($con, $query);
+    
+    // Get existing options
+    $options_result = mysqli_query($con, "SELECT * FROM options WHERE qid='$qid' ORDER BY optionid ASC");
+    $option_ids = [];
+    while($option = mysqli_fetch_array($options_result)) {
+        $option_ids[] = $option['optionid'];
+    }
+    
+    // Update options
+    for($i = 0; $i < 4; $i++) {
+        if(isset($option_ids[$i])) {
+            mysqli_query($con, "UPDATE options SET option='{$choices[$i]}' WHERE optionid='{$option_ids[$i]}'");
+        }
+    }
+    
+    // Update answer
+    $answer_index = ord($answer) - 97; // Convert a,b,c,d to 0,1,2,3
+    if(isset($option_ids[$answer_index])) {
+        mysqli_query($con, "UPDATE answer SET ansid='{$option_ids[$answer_index]}' WHERE qid='$qid'");
+    }
+    
+    echo "<script>alert('Question updated successfully!'); window.location.href='dash.php?q=4&step=1&eid=$eid';</script>";
+}
+
+// Handle delete question
+if(@$_GET['q']=='deletequestion') {
+    $qid = $_GET['qid'];
+    $eid = $_GET['eid'];
+    
+    // Delete from all related tables
+    mysqli_query($con, "DELETE FROM answer WHERE qid='$qid'");
+    mysqli_query($con, "DELETE FROM options WHERE qid='$qid'");
+    mysqli_query($con, "DELETE FROM questions WHERE qid='$qid'");
+    
+    echo "<script>alert('Question deleted successfully!'); window.location.href='dash.php?q=4&step=1&eid=$eid';</script>";
+}
 ?>
 
 

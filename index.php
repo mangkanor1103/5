@@ -303,7 +303,22 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fa fa-school input-icon"></i>
                                     </div>
-                                    <input id="college" name="college" placeholder="Enter year and section" class="form-input pl-10" type="text" required>
+                                    <select id="college" name="college" class="form-input pl-10" required>
+                                        <option value="">Select Year and Section</option>
+                                        <option value="Entrance Exam">Entrance Exam</option>
+                                        <option value="Grade 7 - Section A">Grade 7 - Section A</option>
+                                        <option value="Grade 7 - Section B">Grade 7 - Section B</option>
+                                        <option value="Grade 8 - Section A">Grade 8 - Section A</option>
+                                        <option value="Grade 8 - Section B">Grade 8 - Section B</option>
+                                        <option value="Grade 9 - Section A">Grade 9 - Section A</option>
+                                        <option value="Grade 9 - Section B">Grade 9 - Section B</option>
+                                        <option value="Grade 10 - Section A">Grade 10 - Section A</option>
+                                        <option value="Grade 10 - Section B">Grade 10 - Section B</option>
+                                        <option value="Grade 11 - Section A">Grade 11 - Section A</option>
+                                        <option value="Grade 11 - Section B">Grade 11 - Section B</option>
+                                        <option value="Grade 12 - Section A">Grade 12 - Section A</option>
+                                        <option value="Grade 12 - Section B">Grade 12 - Section B</option>
+                                    </select>
                                 </div>
                             </div>
                             

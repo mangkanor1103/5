@@ -38,10 +38,10 @@ start apache_start.bat
 
 echo Opening index.php in browser...
 timeout /t 3 /nobreak >nul
-start "" "http://localhost/5/index.php"
+start "" "http://localhost/venv39/index.php"
 
 echo Running Python script...
-cd /d C:\xampp\htdocs\5
+cd /d C:\xampp\htdocs\venv39
 start "" python app.py
 
 echo Done!
